@@ -13,9 +13,13 @@ export const onRequest = clerkMiddleware(async (auth: any, req: any) => {
 
     if (userId) {
         try {
-            const client = clerkClient(req)
-            const user = await client.users.getUser(userId)
-            const organizations = await client.organizations.getOrganizationList()
+            const client = clerkClient(req);
+            const user = await client.users.getUser(userId);
+            const params = {
+                userId,
+                limit: 100,
+            }
+            const organizations = await client.users.getOrganizationMembershipList(params)
 
             if (user) {
                 await syncDataToDatabase(userId, user, organizations);

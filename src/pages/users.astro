@@ -1,7 +1,14 @@
 ---
 import SiteLayout from "@layouts/SiteLayout.astro";
 
-const response = await fetch('http://localhost:4321/api/users')
+const userId = Astro.locals.auth().userId
+
+const response = await fetch('http://localhost:4321/api/users', {
+	headers: {
+		"Content-Type": "application/json",
+		"Authorization": `Bearer ${userId}`
+	}
+})
 const { users } = await response.json()
 ---
 

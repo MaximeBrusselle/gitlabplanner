@@ -24,4 +24,5 @@ pnpm-debug.log*
 .idea/
 
 # SQLite database
-sqlite.db
+local.db
+*.db

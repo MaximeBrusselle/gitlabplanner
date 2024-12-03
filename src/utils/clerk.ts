@@ -1,7 +1,8 @@
 import { db } from "@db/index";
 import { usersTable, organizationsTable, organizationMembersTable } from "@db/schema";
 import { eq, and, isNull, inArray } from "drizzle-orm";
-import type { User, Organization } from "@clerk/backend";
+import type { User, Organization, PaginatedResponseJSON } from "@clerk/backend";
+import type { OrganizationMembership } from "@clerk/astro/server";
 
 async function syncUserToDatabase(userId: string, user: User) {
     const existingUser = await db.select()
@@ -30,36 +31,35 @@ async function syncUserToDatabase(userId: string, user: User) {
         .where(eq(usersTable.id, userId));
 }
 
-async function syncOrganizationsToDatabase(organizations: { data: Organization[] }) {
+async function syncOrganizationsToDatabase(organizations: { data: OrganizationMembership[] }) {
     for (const org of organizations.data) {
+        const orgId = org.organization.id;
+        const role = org.role;
         const existingOrg = await db.select()
             .from(organizationsTable)
-            .where(eq(organizationsTable.id, org.id))
+            .where(eq(organizationsTable.id, orgId))
             .limit(1);
 
         if (existingOrg.length === 0) {
             await db.insert(organizationsTable).values({
-                id: org.id,
-                name: org.name,
+                id: orgId,
+                name: org.organization.name,
             });
             return;
         }
         await db.update(organizationsTable)
-            .set({ name: org.name })
-            .where(eq(organizationsTable.id, org.id));
+            .set({ name: org.organization.name })
+            .where(eq(organizationsTable.id, orgId));
     }
 }
 
-async function syncOrganizationMembersToDatabase(userId: string, organizations: { data: Organization[] }) {
-    // Get all current organization memberships for the user
+async function syncOrganizationMembersToDatabase(userId: string, organizations: { data: OrganizationMembership[] }) {
     const existingMemberships = await db.select()
         .from(organizationMembersTable)
         .where(eq(organizationMembersTable.userId, userId));
 
-    // Create a set of organization IDs from the current data
-    const currentOrgIds = new Set(organizations.data.map(org => org.id));
+    const currentOrgIds = new Set(organizations.data.map(org => org.organization.id));
 
-    // Remove memberships that no longer exist
     for (const membership of existingMemberships) {
         if (!currentOrgIds.has(membership.organizationId)) {
             await db.delete(organizationMembersTable)
@@ -72,16 +72,15 @@ async function syncOrganizationMembersToDatabase(userId: string, organizations: 
         }
     }
 
-    // Add new memberships
     for (const org of organizations.data) {
         const existingMember = await db.select()
             .from(organizationMembersTable)
-            .where(and(eq(organizationMembersTable.organizationId, org.id), eq(organizationMembersTable.userId, userId)))
+            .where(and(eq(organizationMembersTable.organizationId, org.organization.id), eq(organizationMembersTable.userId, userId)))
             .limit(1);
 
         if (existingMember.length === 0) {
             await db.insert(organizationMembersTable).values({
-                organizationId: org.id,
+                organizationId: org.organization.id,
                 userId: userId,
                 createdAt: new Date().toISOString(),
             });
@@ -90,7 +89,6 @@ async function syncOrganizationMembersToDatabase(userId: string, organizations: 
 }
 
 async function deleteUnusedOrganizations() {
-    // Get all orgs that have no members
     const orgsWithoutMembers = await db
         .select({ id: organizationsTable.id })
         .from(organizationsTable)
@@ -100,7 +98,6 @@ async function deleteUnusedOrganizations() {
         )
         .where(isNull(organizationMembersTable.organizationId));
 
-    // Delete orgs that have no members
     if (orgsWithoutMembers.length > 0) {
         const orgIdsToDelete = orgsWithoutMembers.map(org => org.id);
         await db.delete(organizationsTable)
@@ -111,7 +108,7 @@ async function deleteUnusedOrganizations() {
 export async function syncDataToDatabase(
     userId: string,
     user: User,
-    organizations: { data: Organization[] }
+    organizations: { data: OrganizationMembership[] }
 ) {
     try {
         await syncUserToDatabase(userId, user);
