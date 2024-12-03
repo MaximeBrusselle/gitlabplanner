@@ -4,7 +4,7 @@ import { usersTable, organizationMembersTable, organizationsTable } from "@db/sc
 import { eq, inArray, and, notInArray } from "drizzle-orm";
 import type { UserWithOrganizations } from "types/UserWithOrganizations";
 
-export async function GET({ request }: { request: any }) {
+export const GET: APIRoute = async ({ request }) => {
 	const currentUserId = request.headers.get("Authorization")?.split(" ")[1];
 	if (!currentUserId) {
 		return new Response(

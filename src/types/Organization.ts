@@ -1,5 +1,5 @@
 export type Organization = {
     id: string;
     name: string;
-    imageUrl: string;
+    imageUrl: string | null;
 }
