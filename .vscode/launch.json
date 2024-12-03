@@ -1,11 +1,25 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "command": "./node_modules/.bin/astro dev",
-      "name": "Development server",
-      "request": "launch",
-      "type": "node-terminal"
-    }
-  ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"command": "npm run dev",
+			"name": "Development Server",
+			"request": "launch",
+			"type": "node-terminal"
+		},
+		{
+			"name": "Development Client",
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:4321",
+			"webRoot": "${workspaceFolder}/src",
+			"skipFiles": ["**/node_modules/**"]
+		}
+	],
+	"compounds": [
+		{
+			"name": "Run Server and Client",
+			"configurations": ["Development Server", "Development Client"]
+		}
+	]
 }

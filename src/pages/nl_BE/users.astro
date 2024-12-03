@@ -1,0 +1,52 @@
+---
+import SiteLayout from "@layouts/SiteLayout.astro";
+
+const response = await fetch('http://localhost:4321/api/users')
+const { users } = await response.json()
+---
+
+<SiteLayout title="Users List">
+	<div class="container mx-auto">
+		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Users</h1>
+
+		<!-- Users list -->
+		<div class="overflow-x-auto">
+			<table class="table table-zebra w-full">
+				<thead>
+					<tr>
+						<th class="bg-base-200 dark:bg-base-300">Image</th>
+						<th class="bg-base-200 dark:bg-base-300">Email</th>
+						<th class="bg-base-200 dark:bg-base-300">Name</th>
+						<th class="bg-base-200 dark:bg-base-300">Created At</th>
+						<th class="bg-base-200 dark:bg-base-300">Last Sign In</th>
+					</tr>
+				</thead>
+				<tbody>
+					{users.map((user: any) => (
+						<tr class="hover:bg-base-200 dark:hover:bg-base-300 transition-colors duration-200">
+							<td class="w-20">
+								<div class="avatar">
+									<div class="mask mask-squircle w-12 h-12">
+										<img src={user.imageUrl} alt={user.name} />
+									</div>
+								</div>
+							</td>
+							<td class="text-base-content dark:text-base-content">
+								<div class="font-medium">{user.email}</div>
+							</td>
+							<td class="text-base-content dark:text-base-content">
+								<div class="font-semibold">{user.name}</div>
+							</td>
+							<td class="text-base-content/80 dark:text-base-content/80">
+								<div>{new Date(user.createdAt).toLocaleString()}</div>
+							</td>
+							<td class="text-base-content/80 dark:text-base-content/80">
+								<div>{new Date(user.lastSignIn).toLocaleString()}</div>
+							</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</SiteLayout>
