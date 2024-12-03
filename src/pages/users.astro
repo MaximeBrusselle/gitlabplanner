@@ -1,7 +1,5 @@
 ---
 import SiteLayout from "@layouts/SiteLayout.astro";
-import type { OrgUsers } from "types/OrgUsers";
-import type { UserWithOrganizations } from "types/UserWithOrganizations";
 import { groupUsersByOrg } from "utils/groupUsersByOrg";
 
 const userId = Astro.locals.auth().userId
@@ -22,7 +20,14 @@ const usersByOrg = groupUsersByOrg(users)
 
 		{Object.entries(usersByOrg).map(([orgId, orgData]: [string, any]) => (
 			<div class="mb-12">
-				<h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">{orgData.name}</h2>
+				<div class="flex items-center gap-4 mb-4">
+					<div class="avatar">
+						<div class="mask mask-squircle w-12 h-12">
+							<img src={orgData.imageUrl} alt={orgData.name} />
+						</div>
+					</div>
+					<h2 class="text-2xl font-bold text-gray-800 dark:text-white">{orgData.name}</h2>
+				</div>
 				<div class="overflow-x-auto">
 					<table class="table table-zebra w-full">
 						<thead>

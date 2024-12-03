@@ -20,7 +20,8 @@ export async function GET({ request }: { request: any }) {
 	const organizationsOfCurrentUser = await db
 		.select({
 			id: organizationsTable.id,
-			name: organizationsTable.name
+			name: organizationsTable.name,
+			imageUrl: organizationsTable.imageUrl
 		})
 		.from(organizationMembersTable)
 		.innerJoin(organizationsTable, eq(organizationMembersTable.organizationId, organizationsTable.id))
@@ -52,7 +53,8 @@ export async function GET({ request }: { request: any }) {
 			const userOrgs = await db
 				.select({
 					id: organizationsTable.id,
-					name: organizationsTable.name
+					name: organizationsTable.name,
+					imageUrl: organizationsTable.imageUrl
 				})
 				.from(organizationMembersTable)
 				.innerJoin(organizationsTable, eq(organizationMembersTable.organizationId, organizationsTable.id))
@@ -73,27 +75,3 @@ export async function GET({ request }: { request: any }) {
 		{ status: 200 }
 	);
 }
-
-export const POST: APIRoute = async ({ request }) => {
-	const body = await request.json();
-	const existingUser = await db.select().from(usersTable).where(eq(usersTable.id, body.id)).limit(1);
-	if (existingUser.length > 0) {
-		await db
-			.update(usersTable)
-			.set({
-				lastSignIn: new Date().toISOString(),
-				name: body.name,
-				email: body.email
-			})
-			.where(eq(usersTable.id, body.id));
-		return new Response(JSON.stringify({ message: "User updated successfully" }));
-	}
-	await db.insert(usersTable).values({
-		id: body.id,
-		name: body.name,
-		email: body.email,
-		createdAt: new Date().toISOString(),
-		lastSignIn: new Date().toISOString()
-	});
-	return new Response(JSON.stringify({ message: "User created successfully" }));
-};

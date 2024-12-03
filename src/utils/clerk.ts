@@ -44,11 +44,12 @@ async function syncOrganizationsToDatabase(organizations: { data: OrganizationMe
             await db.insert(organizationsTable).values({
                 id: orgId,
                 name: org.organization.name,
+                imageUrl: org.organization.imageUrl,
             });
             return;
         }
         await db.update(organizationsTable)
-            .set({ name: org.organization.name })
+            .set({ name: org.organization.name, imageUrl: org.organization.imageUrl })
             .where(eq(organizationsTable.id, orgId));
     }
 }

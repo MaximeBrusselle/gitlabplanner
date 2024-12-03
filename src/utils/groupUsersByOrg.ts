@@ -7,6 +7,7 @@ export function groupUsersByOrg(users: UserWithOrganizations[]) {
 			if (!acc[org.id]) {
 				acc[org.id] = {
 					name: org.name,
+					imageUrl: org.imageUrl,
 					users: []
 				};
 			}

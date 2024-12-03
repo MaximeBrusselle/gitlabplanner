@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e2a4de7a-f811-4bcb-b56e-ea1338b90a71",
+  "id": "30b48e3f-2c89-4ede-9f02-57788e4544e2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "organization_members": {
@@ -27,7 +27,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-03T16:52:11.276Z'"
+          "default": "'2024-12-03T17:23:08.221Z'"
         }
       },
       "indexes": {},
@@ -79,6 +79,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -124,7 +131,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-03T16:52:11.274Z'"
+          "default": "'2024-12-03T17:23:08.219Z'"
         },
         "last_sign_in": {
           "name": "last_sign_in",
@@ -132,7 +139,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-03T16:52:11.275Z'"
+          "default": "'2024-12-03T17:23:08.220Z'"
         }
       },
       "indexes": {

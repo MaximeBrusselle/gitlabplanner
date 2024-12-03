@@ -12,6 +12,7 @@ export const usersTable = sqliteTable("users", {
 export const organizationsTable = sqliteTable("organizations", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  imageUrl: text("image_url"),
 });
 
 export const organizationMembersTable = sqliteTable("organization_members", {
