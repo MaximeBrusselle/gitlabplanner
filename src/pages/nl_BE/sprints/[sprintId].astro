@@ -1,0 +1,94 @@
+---
+import SiteLayout from "@layouts/SiteLayout.astro";
+import type { SprintWithMembers } from "types/Sprint";
+import type { User } from "types/User";
+
+const { sprintId } = Astro.params;
+const userId = Astro.locals.auth().userId;
+
+if (!userId) {
+	return Astro.redirect("/sign-in");
+}
+
+const response = await fetch(`http://localhost:4321/api/sprints/${sprintId}`, {
+	headers: {
+		"x-user-id": userId,
+	},
+});
+
+const { sprint } = await response.json();
+
+// Format dates to be more readable
+const startDate = new Date(sprint.startDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+const endDate = new Date(sprint.endDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+const statusColors: Record<string, string> = {
+	active: "badge-success",
+	completed: "badge-info",
+	cancelled: "badge-error",
+	planned: "badge-warning",
+};
+---
+
+<SiteLayout title={`Sprint: ${sprint.name}`}>
+	<div class="container mx-auto px-4 py-8">
+		<div class="card bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 w-full">
+			<div class="card-body">
+				<div class="flex justify-between items-start mb-6">
+					<div>
+						<h1 class="text-3xl font-bold text-gray-900 dark:text-white">{sprint.name}</h1>
+						<p class="text-gray-600 dark:text-gray-400 mt-2">{sprint.description}</p>
+					</div>
+					<div class={`badge ${statusColors[sprint.status]} badge-lg capitalize`}>
+						{sprint.status}
+					</div>
+				</div>
+
+				<div class="divider"></div>
+
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+					<div class="space-y-4">
+						<div>
+							<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Timeline</h3>
+							<div class="mt-2 space-y-2">
+								<div class="flex justify-between">
+									<span class="text-gray-600 dark:text-gray-400">Start Date:</span>
+									<span class="font-medium">{startDate}</span>
+								</div>
+								<div class="flex justify-between">
+									<span class="text-gray-600 dark:text-gray-400">End Date:</span>
+									<span class="font-medium">{endDate}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="space-y-4">
+						<div>
+							<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Team Members</h3>
+							<div class="mt-2 space-y-2">
+								{
+									sprint.members?.map((member: User) => (
+										<div class="flex items-center gap-2">
+											<div class="avatar placeholder">
+												<div class="bg-neutral-focus text-neutral-content rounded-full w-8">
+													<img src={member.imageUrl} alt={member.name} />
+												</div>
+											</div>
+											<span>{member.name}</span>
+										</div>
+									))
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="card-actions justify-end mt-6">
+					<a href="/sprints" class="btn">Back to Sprints</a>
+					<button class="btn btn-primary">Edit Sprint</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</SiteLayout>

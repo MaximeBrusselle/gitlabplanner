@@ -5,7 +5,7 @@ import { eq, inArray, and, notInArray } from "drizzle-orm";
 import type { UserWithOrganizations } from "types/UserWithOrganizations";
 
 export const GET: APIRoute = async ({ request }) => {
-	const currentUserId = request.headers.get("Authorization")?.split(" ")[1];
+	const currentUserId = request.headers.get("x-user-id");
 	if (!currentUserId) {
 		return new Response(
 			JSON.stringify({

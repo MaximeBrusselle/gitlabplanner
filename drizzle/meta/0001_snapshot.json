@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a99dd0e6-b332-4b36-8fbe-b86dd5d9419c",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "b88d8ba1-4d6b-4f4e-972f-80ad35101727",
+  "prevId": "a99dd0e6-b332-4b36-8fbe-b86dd5d9419c",
   "tables": {
     "application_members": {
       "name": "application_members",
@@ -138,7 +138,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-05T10:19:01.304Z'"
+          "default": "'2024-12-05T10:40:48.653Z'"
         }
       },
       "indexes": {},
@@ -324,6 +324,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "start_date": {
           "name": "start_date",
           "type": "text",
@@ -427,7 +434,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-05T10:19:01.303Z'"
+          "default": "'2024-12-05T10:40:48.652Z'"
         },
         "last_sign_in": {
           "name": "last_sign_in",
@@ -435,7 +442,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-05T10:19:01.303Z'"
+          "default": "'2024-12-05T10:40:48.652Z'"
         }
       },
       "indexes": {

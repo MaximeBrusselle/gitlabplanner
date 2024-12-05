@@ -2,9 +2,10 @@ import { clerkMiddleware, createRouteMatcher, clerkClient } from '@clerk/astro/s
 import { syncDataToDatabase } from './utils/clerk';
 
 // Protect all routes that start with /api/users
-const isProtectedRoute = createRouteMatcher(["/users"])
+const isProtectedRoute = createRouteMatcher(["/users", "/sprints", "/organizations"])
 
-export const onRequest = clerkMiddleware(async (auth: any, req: any) => {
+export const onRequest = clerkMiddleware(async (auth: any, req: any, next: any) => {
+    // debugger
     const { redirectToSignIn, userId } = auth()
 
     if (!userId && isProtectedRoute(req)) {
@@ -28,4 +29,6 @@ export const onRequest = clerkMiddleware(async (auth: any, req: any) => {
             console.error('Error in middleware:', error);
         }
     }
+
+    return next()
 });

@@ -1,0 +1,12 @@
+---
+import SiteLayout from "@layouts/SiteLayout.astro";
+import { SprintForm } from "@components/sprints/SprintForm";
+const { userId } = Astro.locals.auth();
+---
+
+<SiteLayout title="Create Sprint">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Create New Sprint</h1>
+        <SprintForm client:load userId={userId} />
+    </div>
+</SiteLayout>
