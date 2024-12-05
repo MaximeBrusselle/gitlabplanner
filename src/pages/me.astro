@@ -1,6 +1,5 @@
 ---
 const response = await fetch("http://localhost:4321/api/me");
-const data = await response.json();
 ---
 
-<pre>{JSON.stringify(data)}</pre>
+<pre>{JSON.stringify(response)}</pre>
