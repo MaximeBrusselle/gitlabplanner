@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
 import { db } from "db/index";
-import { sprintsTable, sprintMembersTable } from "db/schema";
+import { sprintsTable, sprintMembersTable, organizationMembersTable } from "db/schema";
 import { eq, inArray } from "drizzle-orm";
 import type { Sprint } from "types/Sprint";
 import type { CustomLocals } from "types/CustomLocals";
 import { syncDataToDatabase } from "utils/clerk";
-import type { OrganizationRole } from "types/Organization";
+import { OrganizationRole } from "types/Organization";
 
 export const GET: APIRoute = async ({ locals }) => {
     const currentUserId = locals.auth().userId;
@@ -38,6 +38,7 @@ export const GET: APIRoute = async ({ locals }) => {
 };
 
 export const POST: APIRoute = async ({ locals, request }) => {
+    debugger
     const customLocals = locals as CustomLocals;
     const user = await customLocals.currentUser();
     if (!user) {
@@ -64,15 +65,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
     const newSprint = await db.insert(sprintsTable).values(sprint).returning();
     const members = new Set<string>(body.members || [currentUserId]);
 
+    const membersOrganisations = await db.select().from(organizationMembersTable).where(inArray(organizationMembersTable.userId, Array.from(members)));
+
     // Check if user has admin role in any organization
     //@ts-ignore
-    const hasAdminRole = orgMemberships.data.some(membership => membership.role === "org:admin");
+    const hasAdminRole = membersOrganisations.some(membership => membership.role === OrganizationRole.Admin);
 
     await db.insert(sprintMembersTable).values(
         Array.from<string>(members).map((userId) => ({
             sprintId: newSprint[0].id,
             userId: userId,
-            role: hasAdminRole ? "admin" : "member" as OrganizationRole
+            role: hasAdminRole || userId === currentUserId ? OrganizationRole.Admin : OrganizationRole.Member
         }))
     );
 

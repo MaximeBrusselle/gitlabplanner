@@ -5,4 +5,7 @@ export type Organization = {
     role: string;
 }
 
-export type OrganizationRole = "admin" | "member";
+export enum OrganizationRole {
+    Admin = "admin",
+    Member = "member"
+}

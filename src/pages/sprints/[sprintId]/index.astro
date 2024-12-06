@@ -33,7 +33,13 @@ const statusColors: Record<string, string> = {
 		<Card hasHoverEffect={false}>
 			<div class="flex justify-between items-start mb-6">
 				<div>
-					<h1 class="text-3xl font-bold text-gray-900 dark:text-white">{sprint.name}</h1>
+					<div class="flex items-center gap-4">
+						<h1 class="text-3xl font-bold text-gray-900 dark:text-white">{sprint.name}</h1>
+						<div class="flex items-center gap-2">
+							<span class="text-xl">📅</span>
+							<span class="text-gray-600 dark:text-gray-400">{startDate} - {endDate}</span>
+						</div>
+					</div>
 					<p class="text-gray-600 dark:text-gray-400 mt-2">{sprint.description}</p>
 				</div>
 				<div class="flex gap-2 items-center">
@@ -49,22 +55,6 @@ const statusColors: Record<string, string> = {
 			<div class="divider"></div>
 
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-				<div class="space-y-4">
-					<div>
-						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Timeline</h3>
-						<div class="mt-2 space-y-2">
-							<div class="flex justify-between">
-								<span class="text-gray-600 dark:text-gray-400">Start Date:</span>
-								<span class="font-medium">{startDate}</span>
-							</div>
-							<div class="flex justify-between">
-								<span class="text-gray-600 dark:text-gray-400">End Date:</span>
-								<span class="font-medium">{endDate}</span>
-							</div>
-						</div>
-					</div>
-				</div>
-
 				<div class="space-y-4">
 					<div>
 						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Team Members</h3>
