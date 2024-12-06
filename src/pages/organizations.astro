@@ -1,21 +1,18 @@
 ---
 import SiteLayout from "@layouts/SiteLayout.astro";
 import { OrganizationProfile, OrganizationList } from "@clerk/astro/components";
+import Card from "@components/Card.astro";
 ---
 
 <SiteLayout title="Organizations">
 	<div class="container mx-auto px-4 py-8 flex flex-row gap-6 justify-center items-center">
-		<div class="card bg-white shadow-lg border border-gray-200">
-			<div class="card-body">
-				<h2 class="card-title text-2xl mb-6">Organization List</h2>
-				<OrganizationList />
-			</div>
-		</div>
-		<div class="card bg-white shadow-lg border border-gray-200">
-			<div class="card-body">
-				<h2 class="card-title text-2xl mb-6">Organization Profile</h2>
-				<OrganizationProfile />
-			</div>
-		</div>
+		<Card hasHoverEffect={false}>
+			<h2 class="card-title text-2xl mb-6">Organization List</h2>
+			<OrganizationList />
+		</Card>
+		<Card hasHoverEffect={false}>
+			<h2 class="card-title text-2xl mb-6">Organization Profile</h2>
+			<OrganizationProfile />
+		</Card>
 	</div>
 </SiteLayout>

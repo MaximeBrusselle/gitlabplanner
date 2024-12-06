@@ -7,7 +7,7 @@ CREATE TABLE `application_members` (
 );
 --> statement-breakpoint
 CREATE TABLE `applications` (
-	`id` text PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`organization_id` text NOT NULL,
 	`name` text NOT NULL,
 	`description` text,
@@ -17,7 +17,8 @@ CREATE TABLE `applications` (
 CREATE TABLE `organization_members` (
 	`organization_id` text NOT NULL,
 	`user_id` text NOT NULL,
-	`created_at` text DEFAULT '2024-12-05T10:19:01.304Z' NOT NULL,
+	`created_at` text DEFAULT '2024-12-06T11:55:43.980Z' NOT NULL,
+	`role` text DEFAULT 'member' NOT NULL,
 	FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -29,7 +30,7 @@ CREATE TABLE `organizations` (
 );
 --> statement-breakpoint
 CREATE TABLE `sprint_applications` (
-	`sprint_id` text NOT NULL,
+	`sprint_id` integer NOT NULL,
 	`application_id` text NOT NULL,
 	FOREIGN KEY (`sprint_id`) REFERENCES `sprints`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`application_id`) REFERENCES `applications`(`id`) ON UPDATE no action ON DELETE no action
@@ -38,6 +39,7 @@ CREATE TABLE `sprint_applications` (
 CREATE TABLE `sprint_members` (
 	`sprint_id` integer NOT NULL,
 	`user_id` text NOT NULL,
+	`role` text DEFAULT 'member' NOT NULL,
 	FOREIGN KEY (`sprint_id`) REFERENCES `sprints`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -45,6 +47,7 @@ CREATE TABLE `sprint_members` (
 CREATE TABLE `sprints` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
+	`description` text,
 	`start_date` text NOT NULL,
 	`end_date` text NOT NULL,
 	`status` text DEFAULT 'planned' NOT NULL,
@@ -59,8 +62,8 @@ CREATE TABLE `users` (
 	`name` text NOT NULL,
 	`email` text NOT NULL,
 	`image_url` text,
-	`created_at` text DEFAULT '2024-12-05T10:19:01.303Z' NOT NULL,
-	`last_sign_in` text DEFAULT '2024-12-05T10:19:01.303Z' NOT NULL
+	`created_at` text DEFAULT '2024-12-06T11:55:43.979Z' NOT NULL,
+	`last_sign_in` text DEFAULT '2024-12-06T11:55:43.979Z' NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

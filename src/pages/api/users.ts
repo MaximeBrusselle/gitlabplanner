@@ -3,19 +3,23 @@ import { db } from "@db/index";
 import { usersTable, organizationMembersTable, organizationsTable } from "@db/schema";
 import { eq, inArray, and, notInArray } from "drizzle-orm";
 import type { UserWithOrganizations } from "types/UserWithOrganizations";
+import type { CustomLocals } from "types/CustomLocals";
+import { syncDataToDatabase } from "utils/clerk";
 
-export const GET: APIRoute = async ({ request }) => {
-	const currentUserId = request.headers.get("x-user-id");
-	if (!currentUserId) {
-		return new Response(
-			JSON.stringify({
-				users: [],
-				message: "Error fetching users: No user provided"
-			}),
-			{ status: 401 }
-		);
+export const GET: APIRoute = async ({ locals }) => {
+	const customLocals = locals as CustomLocals;
+	const user = await customLocals.currentUser();
+	if (!user) {
+		return new Response(JSON.stringify({ message: "Not authenticated" }), { status: 401 });
 	}
-	const currentUser = await db.select().from(usersTable).where(eq(usersTable.id, currentUserId)).limit(1);
+	const currentUserId = user.id;
+	const orgMemberships = await customLocals.getOrganizations();
+
+	//sync user to db
+	//@ts-ignore
+	await syncDataToDatabase(currentUserId, user, orgMemberships);
+
+	const currentUser = await db.select().from(usersTable).where(eq(usersTable.id, user.id)).limit(1);
 
 	const organizationsOfCurrentUser = await db
 		.select({
@@ -59,7 +63,7 @@ export const GET: APIRoute = async ({ request }) => {
 				.from(organizationMembersTable)
 				.innerJoin(organizationsTable, eq(organizationMembersTable.organizationId, organizationsTable.id))
 				.where(eq(organizationMembersTable.userId, user.id));
-			
+
 			return {
 				...user,
 				organizations: userOrgs

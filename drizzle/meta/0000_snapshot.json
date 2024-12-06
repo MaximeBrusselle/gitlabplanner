@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a99dd0e6-b332-4b36-8fbe-b86dd5d9419c",
+  "id": "dfe2c29e-b128-4301-90ba-b535c04b5c5d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "application_members": {
@@ -68,10 +68,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": true
         },
         "organization_id": {
           "name": "organization_id",
@@ -138,7 +138,15 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-05T10:19:01.304Z'"
+          "default": "'2024-12-06T11:55:43.980Z'"
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'member'"
         }
       },
       "indexes": {},
@@ -210,7 +218,7 @@
       "columns": {
         "sprint_id": {
           "name": "sprint_id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -272,6 +280,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'member'"
         }
       },
       "indexes": {},
@@ -322,6 +338,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "start_date": {
@@ -427,7 +450,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-05T10:19:01.303Z'"
+          "default": "'2024-12-06T11:55:43.979Z'"
         },
         "last_sign_in": {
           "name": "last_sign_in",
@@ -435,7 +458,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-05T10:19:01.303Z'"
+          "default": "'2024-12-06T11:55:43.979Z'"
         }
       },
       "indexes": {

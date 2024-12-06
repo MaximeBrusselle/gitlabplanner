@@ -3,6 +3,7 @@ import { usersTable, organizationsTable, organizationMembersTable } from "@db/sc
 import { eq, and, isNull, inArray } from "drizzle-orm";
 import type { User, Organization, PaginatedResponseJSON } from "@clerk/backend";
 import type { OrganizationMembership } from "@clerk/astro/server";
+import type { OrganizationRole } from "types/Organization";
 
 async function syncUserToDatabase(userId: string, user: User) {
     const existingUser = await db.select()
@@ -34,7 +35,6 @@ async function syncUserToDatabase(userId: string, user: User) {
 async function syncOrganizationsToDatabase(organizations: { data: OrganizationMembership[] }) {
     for (const org of organizations.data) {
         const orgId = org.organization.id;
-        const role = org.role;
         const existingOrg = await db.select()
             .from(organizationsTable)
             .where(eq(organizationsTable.id, orgId))
@@ -84,6 +84,7 @@ async function syncOrganizationMembersToDatabase(userId: string, organizations: 
                 organizationId: org.organization.id,
                 userId: userId,
                 createdAt: new Date().toISOString(),
+                role: org.role.substring(4) as OrganizationRole,
             });
         }
     }

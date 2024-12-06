@@ -1,0 +1,13 @@
+---
+interface Props {
+  hasHoverEffect?: boolean;
+}
+
+const { hasHoverEffect = true } = Astro.props;
+---
+
+<div class={`card bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 w-full ${hasHoverEffect ? 'hover:shadow-2xl transition-shadow duration-200' : ''}`}>
+  <div class="card-body">
+    <slot />
+  </div>
+</div>

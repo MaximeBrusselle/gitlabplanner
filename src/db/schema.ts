@@ -1,4 +1,4 @@
-import { int, numeric, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { int, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const usersTable = sqliteTable("users", {
   id: text("id").primaryKey(),
@@ -23,6 +23,7 @@ export const organizationMembersTable = sqliteTable("organization_members", {
     .notNull()
     .references(() => usersTable.id),
   createdAt: text("created_at").notNull().default(new Date().toISOString()),
+  role: text("role", { enum: ["admin", "member"] }).notNull().default("member"),
 });
 
 export const sprintsTable = sqliteTable("sprints", {
@@ -40,10 +41,11 @@ export const sprintsTable = sqliteTable("sprints", {
 export const sprintMembersTable = sqliteTable("sprint_members", {
   sprintId: int("sprint_id").notNull().references(() => sprintsTable.id),
   userId: text("user_id").notNull().references(() => usersTable.id),
+  role: text("role", { enum: ["admin", "member"] }).notNull().default("member"),
 });
 
 export const applicationsTable = sqliteTable("applications", {
-  id: text("id").primaryKey(),
+  id: int("id").primaryKey({ autoIncrement: true }),
   organizationId: text("organization_id").notNull().references(() => organizationsTable.id),
   name: text("name").notNull(),
   description: text("description"),
@@ -56,6 +58,6 @@ export const applicationMembersTable = sqliteTable("application_members", {
 });
 
 export const sprintApplicationsTable = sqliteTable("sprint_applications", {
-  sprintId: text("sprint_id").notNull().references(() => sprintsTable.id),
+  sprintId: int("sprint_id").notNull().references(() => sprintsTable.id),
   applicationId: text("application_id").notNull().references(() => applicationsTable.id),
 });

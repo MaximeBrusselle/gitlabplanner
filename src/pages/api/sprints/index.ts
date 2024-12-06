@@ -1,11 +1,14 @@
 import type { APIRoute } from "astro";
-import { db } from "@db/index";
-import { sprintsTable, sprintMembersTable } from "@db/schema";
+import { db } from "db/index";
+import { sprintsTable, sprintMembersTable } from "db/schema";
 import { eq, inArray } from "drizzle-orm";
 import type { Sprint } from "types/Sprint";
+import type { CustomLocals } from "types/CustomLocals";
+import { syncDataToDatabase } from "utils/clerk";
+import type { OrganizationRole } from "types/Organization";
 
-export const GET: APIRoute = async ({ request }) => {
-    const currentUserId = request.headers.get("x-user-id");
+export const GET: APIRoute = async ({ locals }) => {
+    const currentUserId = locals.auth().userId;
     if (!currentUserId) {
         return new Response(
             JSON.stringify({
@@ -34,10 +37,10 @@ export const GET: APIRoute = async ({ request }) => {
     );
 };
 
-export const POST: APIRoute = async ({ request }) => {
-    debugger
-    const currentUserId = request.headers.get("x-user-id");
-    if (!currentUserId) {
+export const POST: APIRoute = async ({ locals, request }) => {
+    const customLocals = locals as CustomLocals;
+    const user = await customLocals.currentUser();
+    if (!user) {
         return new Response(
             JSON.stringify({
                 message: "Error creating sprint: No user provided"
@@ -45,6 +48,13 @@ export const POST: APIRoute = async ({ request }) => {
             { status: 401 }
         );
     }
+    const currentUserId = user.id;
+    const orgMemberships = await customLocals.getOrganizations();
+
+    //sync user to db
+    //@ts-ignore
+    await syncDataToDatabase(currentUserId, user, orgMemberships);
+
     const body = await request.json();
     const sprint: Sprint = {
         ...body,
@@ -52,10 +62,19 @@ export const POST: APIRoute = async ({ request }) => {
     };
 
     const newSprint = await db.insert(sprintsTable).values(sprint).returning();
-    await db.insert(sprintMembersTable).values({
-        sprintId: newSprint[0].id,
-        userId: currentUserId
-    });
+    const members = new Set<string>(body.members || [currentUserId]);
+
+    // Check if user has admin role in any organization
+    //@ts-ignore
+    const hasAdminRole = orgMemberships.data.some(membership => membership.role === "org:admin");
+
+    await db.insert(sprintMembersTable).values(
+        Array.from<string>(members).map((userId) => ({
+            sprintId: newSprint[0].id,
+            userId: userId,
+            role: hasAdminRole ? "admin" : "member" as OrganizationRole
+        }))
+    );
 
     return new Response(
         JSON.stringify({

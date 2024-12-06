@@ -1,5 +1,6 @@
 ---
 import type { Sprint } from "types/Sprint";
+import Card from "@components/Card.astro";
 
 interface Props {
 	sprint: Sprint;
@@ -8,8 +9,8 @@ interface Props {
 const { sprint } = Astro.props;
 
 // Format dates to be more readable
-const startDate = new Date(sprint.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-const endDate = new Date(sprint.endDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+const startDate = new Date(sprint.startDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+const endDate = new Date(sprint.endDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
 // Status colors
 const statusColors = {
@@ -20,30 +21,28 @@ const statusColors = {
 };
 ---
 
-<div class="card bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 w-full hover:shadow-2xl transition-shadow duration-200">
-	<div class="card-body">
-		<div class="flex justify-between items-start">
-			<h2 class="card-title text-2xl font-bold text-gray-900 dark:text-white">{sprint.name}</h2>
-			<div class={`badge ${statusColors[sprint.status]} badge-lg capitalize`}>
-				{sprint.status}
-			</div>
-		</div>
-
-		<div class="divider my-2"></div>
-
-		<div class="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
-			<div>
-				<span class="font-semibold">Start Date:</span>
-				<p>{startDate}</p>
-			</div>
-			<div>
-				<span class="font-semibold">End Date:</span>
-				<p>{endDate}</p>
-			</div>
-		</div>
-
-		<div class="card-actions justify-end mt-4">
-			<a href={`/sprints/${sprint.id}`} class="btn btn-primary"> View Details </a>
+<Card hasHoverEffect={true}>
+	<div class="flex justify-between items-start">
+		<h2 class="card-title text-2xl font-bold text-gray-900 dark:text-white">{sprint.name}</h2>
+		<div class={`badge ${statusColors[sprint.status]} badge-lg capitalize`}>
+			{sprint.status}
 		</div>
 	</div>
-</div>
+
+	<div class="divider my-2"></div>
+
+	<div class="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+		<div>
+			<span class="font-semibold">Start Date:</span>
+			<p>{startDate}</p>
+		</div>
+		<div>
+			<span class="font-semibold">End Date:</span>
+			<p>{endDate}</p>
+		</div>
+	</div>
+
+	<div class="card-actions justify-end mt-4">
+		<a href={`/sprints/${sprint.id}`} class="btn btn-primary"> View Details </a>
+	</div>
+</Card>
