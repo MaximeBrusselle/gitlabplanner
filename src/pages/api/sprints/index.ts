@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { db } from "db/index";
 import { sprintsTable, sprintMembersTable, organizationMembersTable } from "db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, and } from "drizzle-orm";
 import type { Sprint } from "types/Sprint";
 import type { CustomLocals } from "types/CustomLocals";
 import { syncDataToDatabase } from "utils/clerk";
@@ -65,18 +65,19 @@ export const POST: APIRoute = async ({ locals, request }) => {
     const newSprint = await db.insert(sprintsTable).values(sprint).returning();
     const members = new Set<string>(body.members || [currentUserId]);
 
-    const membersOrganisations = await db.select().from(organizationMembersTable).where(inArray(organizationMembersTable.userId, Array.from(members)));
-
-    // Check if user has admin role in any organization
     //@ts-ignore
-    const hasAdminRole = membersOrganisations.some(membership => membership.role === OrganizationRole.Admin);
+    const orgIds = orgMemberships.data.map(membership => membership.organization.id);
+    const membersOrganisations = await db.select().from(organizationMembersTable).where(and(inArray(organizationMembersTable.userId, Array.from(members)), inArray(organizationMembersTable.organizationId, orgIds)));
 
     await db.insert(sprintMembersTable).values(
-        Array.from<string>(members).map((userId) => ({
-            sprintId: newSprint[0].id,
-            userId: userId,
-            role: hasAdminRole || userId === currentUserId ? OrganizationRole.Admin : OrganizationRole.Member
-        }))
+        Array.from<string>(members).map((userId) => {
+            const role = membersOrganisations.some(membership => membership.userId === userId && membership.role === OrganizationRole.Admin) ? OrganizationRole.Admin : OrganizationRole.Member;
+            return {
+                sprintId: newSprint[0].id,
+                userId: userId,
+                role: role
+            }
+        })
     );
 
     return new Response(

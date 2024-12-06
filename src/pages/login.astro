@@ -1,0 +1,14 @@
+---
+import { syncDataToDatabase } from "utils/clerk";
+import type { CustomLocals } from "types/CustomLocals";
+
+const customLocals = Astro.locals as CustomLocals;
+const user = await customLocals.currentUser();
+const orgMemberships = await customLocals.getOrganizations();
+
+if (user) {
+    //@ts-ignore
+    await syncDataToDatabase(user.id, user, orgMemberships);
+}
+return Astro.redirect("/");
+---
