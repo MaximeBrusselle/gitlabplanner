@@ -36,12 +36,16 @@ export const sprintsTable = sqliteTable("sprints", {
   createdBy: text("created_by").notNull().references(() => usersTable.id),
   availableHours: int("available_hours").notNull().default(0),
   spentHours: int("spent_hours").notNull().default(0),
+  plannedHours: int("planned_hours").notNull().default(0),
 });
 
 export const sprintMembersTable = sqliteTable("sprint_members", {
   sprintId: int("sprint_id").notNull().references(() => sprintsTable.id),
   userId: text("user_id").notNull().references(() => usersTable.id),
   role: text("role", { enum: ["admin", "member"] }).notNull().default("member"),
+  availableHours: int("available_hours").notNull().default(0),
+  spentHours: int("spent_hours").notNull().default(0),
+  plannedHours: int("planned_hours").notNull().default(0),
 });
 
 export const applicationsTable = sqliteTable("applications", {
@@ -60,4 +64,7 @@ export const applicationMembersTable = sqliteTable("application_members", {
 export const sprintApplicationsTable = sqliteTable("sprint_applications", {
   sprintId: int("sprint_id").notNull().references(() => sprintsTable.id),
   applicationId: text("application_id").notNull().references(() => applicationsTable.id),
+  availableHours: int("available_hours").notNull().default(0),
+  spentHours: int("spent_hours").notNull().default(0),
+  plannedHours: int("planned_hours").notNull().default(0),
 });

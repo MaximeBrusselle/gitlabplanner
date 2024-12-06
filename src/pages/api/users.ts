@@ -6,7 +6,7 @@ import type { UserWithOrganizations } from "types/UserWithOrganizations";
 import type { CustomLocals } from "types/CustomLocals";
 import { syncDataToDatabase } from "utils/clerk";
 
-export const GET: APIRoute = async ({ locals }) => {
+export const GET: APIRoute = async ({ locals, request }) => {
 	const customLocals = locals as CustomLocals;
 	const user = await customLocals.currentUser();
 	if (!user) {

@@ -25,11 +25,22 @@ export default function UserSelector({ groupedUsers, currentUserId }: UserSelect
 		} else {
 			newSelected.delete(userId);
 		}
+		console.log("🚀 ~ handleUserSelection ~ newSelected:", newSelected);
 		setSelectedUsers(newSelected);
 	};
 
 	return (
 		<div className="space-y-8">
+			{/* Add hidden inputs for all selected users */}
+			{Array.from(selectedUsers).map(userId => (
+				<input 
+					key={userId}
+					type="hidden"
+					name="members"
+					value={userId}
+				/>
+			))}
+
 			{Object.entries(groupedUsers).map(([_, orgUsers]) => (
 				<div key={orgUsers.name} className="card bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 w-full">
 					<div className="card-body">

@@ -4,13 +4,18 @@ import { groupUsersByOrg } from "utils/groupUsersByOrg";
 import { z } from "zod";
 import UserSelector from "@components/sprints/UserSelector";
 
+const currentUserId = Astro.locals.auth().userId;
+if (!currentUserId) {
+	return Astro.redirect("/sprints");
+}
+
 // Define schema for sprint data
 const sprintSchema = z.object({
 	name: z.string().min(1, "Sprint name is required"),
 	description: z.string().optional(),
 	startDate: z.string().min(1, "Start date is required"),
 	endDate: z.string().min(1, "End date is required"),
-	members: z.array(z.string()).min(1, "At least one member is required"),
+	members: z.array(z.string()).min(1, "At least one member is required").default([currentUserId]),
 });
 
 // Fetch users for the form
@@ -22,12 +27,10 @@ const response = await fetch(new URL("/api/users", Astro.url), {
 const { users } = await response.json();
 const groupedUsers = groupUsersByOrg(users);
 
-// Add this to track selected users
-let selectedUsers = new Set<string>();
-
 // Handle form submission
 if (Astro.request.method === "POST") {
 	const formData = await Astro.request.formData();
+	console.log("🚀 ~ formData:", formData)
 	const data = {
 		name: formData.get("name"),
 		description: formData.get("description"),
@@ -58,11 +61,6 @@ if (Astro.request.method === "POST") {
 			// You could handle validation errors here and display them to the user
 		}
 	}
-}
-
-const currentUserId = Astro.locals.auth().userId;
-if (!currentUserId) {
-	return Astro.redirect("/sprints");
 }
 ---
 
