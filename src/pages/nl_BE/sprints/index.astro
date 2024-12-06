@@ -1,13 +1,11 @@
 ---
 import SiteLayout from "@layouts/SiteLayout.astro";
 import SprintCard from "@components/sprints/SprintCard.astro";
-import type { Sprint } from "types/Sprint";
+import type { Sprint } from "@myTypes/Sprint";
 
-const userId = Astro.locals.auth().userId;
-
-const response = await fetch("http://localhost:4321/api/sprints", {
+const response = await fetch(new URL("/api/sprints", Astro.url), {
 	headers: {
-		"x-user-id": userId || ""
+		"Authorization": `Bearer ${await Astro.locals.auth().getToken()}`
 	}
 });
 const { sprints } = await response.json();

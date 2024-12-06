@@ -1,7 +1,7 @@
 ---
 import SiteLayout from "@layouts/SiteLayout.astro";
 import SprintCard from "@components/sprints/SprintCard.astro";
-import type { Sprint } from "types/Sprint";
+import type { Sprint } from "@myTypes/Sprint";
 
 const response = await fetch(new URL("/api/sprints", Astro.url), {
 	headers: {

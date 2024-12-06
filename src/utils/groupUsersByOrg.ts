@@ -1,6 +1,6 @@
-import type { Organization, OrganizationRole } from "types/Organization";
-import type { OrgUsers } from "types/OrgUsers";
-import type { UserWithOrganizations } from "types/UserWithOrganizations";
+import type { Organization, OrganizationRole } from "@myTypes/Organization";
+import type { OrgUsers } from "@myTypes/OrgUsers";
+import type { UserWithOrganizations } from "@myTypes/UserWithOrganizations";
 
 export function groupUsersByOrg(users: UserWithOrganizations[]): Record<string, OrgUsers> {
 	return users.reduce((acc: Record<string, OrgUsers>, user: UserWithOrganizations) => {

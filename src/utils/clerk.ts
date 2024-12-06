@@ -3,7 +3,7 @@ import { usersTable, organizationsTable, organizationMembersTable } from "@db/sc
 import { eq, and, isNull, inArray } from "drizzle-orm";
 import type { User, Organization, PaginatedResponseJSON } from "@clerk/backend";
 import type { OrganizationMembership } from "@clerk/astro/server";
-import type { OrganizationRole } from "types/Organization";
+import type { OrganizationRole } from "@myTypes/Organization";
 
 export async function syncDataToDatabase(
     userId: string, 
@@ -66,16 +66,30 @@ export async function syncDataToDatabase(
 
                 // Insert new memberships
                 await Promise.all(
-                    organizations.data.map(org => 
-                        db.insert(organizationMembersTable)
-                            .values({
-                                organizationId: org.organization.id,
-                                userId: userId,
-                                createdAt: new Date().toISOString(),
-                                role: org.role.substring(4) as OrganizationRole
-                            })
-                            .onConflictDoNothing()
-                    )
+                    organizations.data.map(async org => {
+                        // Check if membership already exists
+                        const existingMembership = await db
+                            .select()
+                            .from(organizationMembersTable)
+                            .where(
+                                and(
+                                    eq(organizationMembersTable.organizationId, org.organization.id),
+                                    eq(organizationMembersTable.userId, userId)
+                                )
+                            )
+                            .limit(1);
+
+                        // Only insert if no existing membership
+                        if (existingMembership.length === 0) {
+                            await db.insert(organizationMembersTable)
+                                .values({
+                                    organizationId: org.organization.id,
+                                    userId: userId,
+                                    createdAt: new Date().toISOString(),
+                                    role: org.role.substring(4) as OrganizationRole
+                                });
+                        }
+                    })
                 );
             })()
         ]);

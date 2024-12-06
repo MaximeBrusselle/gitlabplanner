@@ -1,6 +1,6 @@
 ---
 import SiteLayout from "@layouts/SiteLayout.astro";
-import { groupUsersByOrg } from "utils/groupUsersByOrg";
+import { groupUsersByOrg } from "@utils/groupUsersByOrg";
 
 const response = await fetch(new URL("/api/users", Astro.url), {
 	headers: {

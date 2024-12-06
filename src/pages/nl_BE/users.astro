@@ -1,12 +1,10 @@
 ---
 import SiteLayout from "@layouts/SiteLayout.astro";
-import { groupUsersByOrg } from "utils/groupUsersByOrg";
+import { groupUsersByOrg } from "@utils/groupUsersByOrg";
 
-const userId = Astro.locals.auth().userId;
-
-const response = await fetch("http://localhost:4321/api/users", {
+const response = await fetch(new URL("/api/users", Astro.url), {
 	headers: {
-		"x-user-id": userId || ""
+		"Authorization": `Bearer ${await Astro.locals.auth().getToken()}`
 	}
 });
 const { users } = await response.json();

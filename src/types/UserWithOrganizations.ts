@@ -1,4 +1,4 @@
-import type { Organization } from "types/Organization";
+import type { Organization } from "@myTypes/Organization";
 
 export type UserWithOrganizations = {
     id: string;

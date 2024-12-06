@@ -1,4 +1,4 @@
-import type { User } from "types/User";
+import type { User } from "@myTypes/User";
 
 export type Sprint = {
     id?: number;

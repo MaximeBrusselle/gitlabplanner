@@ -1,5 +1,5 @@
-import type { UserWithOrganizations } from "types/UserWithOrganizations";
-import type { OrganizationRole } from "./Organization";
+import type { UserWithOrganizations } from "@myTypes/UserWithOrganizations";
+import type { OrganizationRole } from "@myTypes/Organization";
 
 export type OrgUsers = {
     name: string;

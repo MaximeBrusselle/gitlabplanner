@@ -2,9 +2,9 @@ import type { APIRoute } from "astro";
 import { db } from "@db/index";
 import { usersTable, organizationMembersTable, organizationsTable } from "@db/schema";
 import { eq, inArray, and, notInArray } from "drizzle-orm";
-import type { UserWithOrganizations } from "types/UserWithOrganizations";
-import type { CustomLocals } from "types/CustomLocals";
-import { syncDataToDatabase } from "utils/clerk";
+import type { UserWithOrganizations } from "@myTypes/UserWithOrganizations";
+import type { CustomLocals } from "@myTypes/CustomLocals";
+import { syncDataToDatabase } from "@utils/clerk";
 
 export const GET: APIRoute = async ({ locals, request }) => {
 	const customLocals = locals as CustomLocals;

@@ -1,6 +1,5 @@
-import Card from "@components/Card.astro";
 import { useState, useEffect } from "react";
-import type { OrgUsers } from "types/OrgUsers";
+import type { OrgUsers } from "@myTypes/OrgUsers";
 
 interface UserSelectorProps {
 	groupedUsers: Record<string, OrgUsers>;

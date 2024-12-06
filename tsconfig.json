@@ -5,13 +5,17 @@
 	"compilerOptions": {
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
-		"baseUrl": "./src",
+		"baseUrl": ".",
 		"paths": {
-			"@components/*": ["./components/*"],
-			"@layouts/*": ["./layouts/*"],
-			"@pages/*": ["./pages/*"],
-			"@db/*": ["./db/*"],
-			"@i18n/*": ["./i18n/*"]
+			"@css/*": ["./src/css/*"],
+			"@components/*": ["./src/components/*"],
+			"@layouts/*": ["./src/layouts/*"],
+			"@pages/*": ["./src/pages/*"],
+			"@db/*": ["./src/db/*"],
+			"@i18n/*": ["./src/i18n/*"],
+			"@myTypes/*": ["./src/types/*"],
+			"@utils/*": ["./src/utils/*"],
+			"@clerk/*": ["./src/clerk/*"]
 		},
 		"strictNullChecks": true,
 		"allowJs": true

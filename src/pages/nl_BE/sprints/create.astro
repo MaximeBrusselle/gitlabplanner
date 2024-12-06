@@ -1,12 +1,124 @@
 ---
 import SiteLayout from "@layouts/SiteLayout.astro";
-import { SprintForm } from "@components/sprints/SprintForm";
-const { userId } = Astro.locals.auth();
+import { groupUsersByOrg } from "@utils/groupUsersByOrg";
+import { z } from "zod";
+import UserSelector from "@components/sprints/UserSelector";
+
+const currentUserId = Astro.locals.auth().userId;
+if (!currentUserId) {
+	return Astro.redirect("/sprints");
+}
+
+// Define schema for sprint data
+const sprintSchema = z.object({
+	name: z.string().min(1, "Sprint name is required"),
+	description: z.string().optional(),
+	startDate: z.string().min(1, "Start date is required"),
+	endDate: z.string().min(1, "End date is required"),
+	members: z.array(z.string()).min(1, "At least one member is required").default([currentUserId]),
+});
+
+// Fetch users for the form
+const response = await fetch(new URL("/api/users", Astro.url), {
+	headers: {
+		Authorization: `Bearer ${await Astro.locals.auth().getToken()}`,
+	},
+});
+const { users } = await response.json();
+const groupedUsers = groupUsersByOrg(users);
+
+// Handle form submission
+if (Astro.request.method === "POST") {
+	const formData = await Astro.request.formData();
+	console.log("🚀 ~ formData:", formData)
+	const data = {
+		name: formData.get("name"),
+		description: formData.get("description"),
+		startDate: formData.get("startDate"),
+		endDate: formData.get("endDate"),
+		members: formData.getAll("members"),
+	};
+
+	try {
+		// Validate the data
+		const validatedData = sprintSchema.parse(data);
+
+		const createResponse = await fetch(new URL("/api/sprints", Astro.url), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${await Astro.locals.auth().getToken()}`,
+			},
+			body: JSON.stringify(validatedData),
+		});
+
+		if (createResponse.ok) {
+			return Astro.redirect("/sprints");
+		}
+	} catch (error) {
+		if (error instanceof z.ZodError) {
+			console.error("Validation error:", error.errors);
+			// You could handle validation errors here and display them to the user
+		}
+	}
+}
 ---
 
 <SiteLayout title="Create Sprint">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8">Create New Sprint</h1>
-        <SprintForm client:load userId={userId} />
-    </div>
+	<div class="max-w-4xl mx-auto px-4 py-8">
+		<h1 class="text-3xl font-bold mb-8">✨ Create New Sprint</h1>
+
+		<form method="POST" class="space-y-8">
+			<div class="space-y-6">
+				<h2 class="text-2xl font-semibold mb-4">📝 General Information</h2>
+
+				<div class="form-control w-full">
+					<label class="label" for="name">
+						<span class="label-text">Sprint Name</span>
+						<span class="label-text-alt text-error">*Required</span>
+					</label>
+					<input type="text" id="name" name="name" required class="input input-bordered w-full" placeholder="Enter sprint name" />
+				</div>
+
+				<div class="form-control w-full">
+					<label class="label" for="description">
+						<span class="label-text">Description</span>
+						<span class="label-text-alt">(Optional)</span>
+					</label>
+					<textarea id="description" name="description" class="textarea textarea-bordered h-24" placeholder="Enter sprint description"></textarea>
+				</div>
+			</div>
+
+			<div class="space-y-6">
+				<h2 class="text-2xl font-semibold mb-4">📅 Sprint Duration</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div class="form-control w-full">
+						<label class="label" for="startDate">
+							<span class="label-text">Start Date</span>
+							<span class="label-text-alt text-error">*Required</span>
+						</label>
+						<input type="date" id="startDate" name="startDate" required class="input input-bordered w-full" />
+					</div>
+
+					<div class="form-control w-full">
+						<label class="label" for="endDate">
+							<span class="label-text">End Date</span>
+							<span class="label-text-alt text-error">*Required</span>
+						</label>
+						<input type="date" id="endDate" name="endDate" required class="input input-bordered w-full" />
+					</div>
+				</div>
+			</div>
+
+			<div class="space-y-6">
+				<h2 class="text-2xl font-semibold mb-4">👥 Team Members</h2>
+				<UserSelector client:load groupedUsers={groupedUsers} currentUserId={currentUserId ?? ""} />
+			</div>
+
+			<div class="flex justify-end gap-4 mt-8">
+				<a href="/sprints" class="btn btn-ghost bg-red-200 dark:bg-red-400 dark:text-white">❌ Cancel</a>
+				<button type="submit" class="btn btn-primary">🚀 Create Sprint</button>
+			</div>
+		</form>
+	</div>
 </SiteLayout>

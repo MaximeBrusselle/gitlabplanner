@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
-import { db } from "db/index";
-import { sprintsTable, sprintMembersTable, organizationMembersTable } from "db/schema";
+import { db } from "@db/index";
+import { sprintsTable, sprintMembersTable, organizationMembersTable } from "@db/schema";
 import { eq, inArray, and } from "drizzle-orm";
-import type { Sprint } from "types/Sprint";
-import type { CustomLocals } from "types/CustomLocals";
-import { syncDataToDatabase } from "utils/clerk";
-import { OrganizationRole } from "types/Organization";
+import type { Sprint } from "@myTypes/Sprint";
+import type { CustomLocals } from "@myTypes/CustomLocals";
+import { syncDataToDatabase } from "@utils/clerk";
+import { OrganizationRole } from "@myTypes/Organization";
 
 export const GET: APIRoute = async ({ locals }) => {
     const currentUserId = locals.auth().userId;

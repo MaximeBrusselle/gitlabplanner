@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { db } from "@db/index";
 import { sprintsTable, sprintMembersTable, usersTable, sprintApplicationsTable } from "@db/schema";
 import { eq, and } from "drizzle-orm";
-import type { Sprint } from "types/Sprint";
+import type { Sprint } from "@myTypes/Sprint";
 
 export const GET: APIRoute = async ({ locals, params }) => {
     const currentUserId = locals.auth().userId;
