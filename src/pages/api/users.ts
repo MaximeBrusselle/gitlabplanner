@@ -18,64 +18,48 @@ export const GET: APIRoute = async ({ locals, request }) => {
 	//sync user to db
 	//@ts-ignore
 	await syncDataToDatabase(currentUserId, user, orgMemberships);
-
-	const currentUser = await db.select().from(usersTable).where(eq(usersTable.id, user.id)).limit(1);
-
-	const organizationsOfCurrentUser = await db
+	//@ts-ignore
+	const orgIds = orgMemberships.data.map((org) => org.organization.id);
+	const usersWithOrgs = await db
 		.select({
-			id: organizationsTable.id,
-			name: organizationsTable.name,
-			imageUrl: organizationsTable.imageUrl
+			id: usersTable.id,
+			name: usersTable.name,
+			email: usersTable.email,
+			imageUrl: usersTable.imageUrl,
+			createdAt: usersTable.createdAt,
+			lastSignIn: usersTable.lastSignIn,
+			organizations: organizationsTable
 		})
-		.from(organizationMembersTable)
-		.innerJoin(organizationsTable, eq(organizationMembersTable.organizationId, organizationsTable.id))
-		.where(eq(organizationMembersTable.userId, currentUserId));
+		.from(usersTable)
+		.innerJoin(organizationMembersTable, eq(organizationMembersTable.userId, usersTable.id))
+		.innerJoin(organizationsTable, eq(organizationsTable.id, organizationMembersTable.organizationId))
+		.where(inArray(organizationMembersTable.organizationId, orgIds))
+		.then((results) => {
+			// Group by user and collect organizations
+			const userMap = results.reduce(
+				(acc, row) => {
+					if (!acc[row.id]) {
+						const { organizations, ...user } = row;
+						acc[row.id] = { ...user, organizations: [organizations] };
+					} else {
+						acc[row.id].organizations.push(row.organizations);
+					}
+					return acc;
+				},
+				{} as Record<string, any>
+			);
 
-	const currentUserComplete = currentUser.map((user) => ({
-		...user,
-		organizations: organizationsOfCurrentUser
-	})) as UserWithOrganizations[];
-
-	const usersInSameOrgs = await db
-		.select()
-		.from(organizationMembersTable)
-		.where(
-			and(
-				inArray(
-					organizationMembersTable.organizationId,
-					organizationsOfCurrentUser.map((org) => org.id)
-				),
-				notInArray(organizationMembersTable.userId, [currentUserId])
-			)
-		)
-		.then((res) => res.map((user) => user.userId));
-
-	const otherUsers = await db.select().from(usersTable).where(inArray(usersTable.id, usersInSameOrgs));
-
-	const otherUsersWithOrgs = await Promise.all(
-		otherUsers.map(async (user) => {
-			const userOrgs = await db
-				.select({
-					id: organizationsTable.id,
-					name: organizationsTable.name,
-					imageUrl: organizationsTable.imageUrl
-				})
-				.from(organizationMembersTable)
-				.innerJoin(organizationsTable, eq(organizationMembersTable.organizationId, organizationsTable.id))
-				.where(eq(organizationMembersTable.userId, user.id));
-
-			return {
-				...user,
-				organizations: userOrgs
-			};
-		})
-	);
+			// Convert to array and sort by name
+			return Object.values(userMap).sort((a, b) => 
+				a.name.localeCompare(b.name)
+			);
+		});
 
 	return new Response(
 		JSON.stringify({
-			users: [...currentUserComplete, ...otherUsersWithOrgs],
+			users: usersWithOrgs,
 			message: "got users"
 		}),
 		{ status: 200 }
 	);
-}
+};

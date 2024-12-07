@@ -1,8 +1,11 @@
 ---
 import { HoursGraph } from "@components/sprints/HoursGraph";
 import SiteLayout from "@layouts/SiteLayout.astro";
+import "@css/globals.css";
 ---
 
 <SiteLayout title="Test">
-	<HoursGraph />
+	<div class="w-full flex flex-row">
+		<HoursGraph client:load />
+	</div>
 </SiteLayout>
