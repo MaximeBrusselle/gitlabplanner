@@ -6,8 +6,6 @@ interface Props {
 const { hasHoverEffect = true } = Astro.props;
 ---
 
-<div class={`card bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 w-full ${hasHoverEffect ? 'hover:shadow-2xl transition-shadow duration-200' : ''}`}>
-  <div class="card-body">
-    <slot />
-  </div>
+<div class={`p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 w-full ${hasHoverEffect ? 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200' : ''}`}>
+  <slot />
 </div>

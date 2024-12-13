@@ -1,0 +1,64 @@
+---
+import Code from "astro/components/Code.astro";
+
+import ConfettiLauncher from "@components/general/ConfettiLauncher.astro";
+import * as readMe from "@components/pages/README.md";
+---
+
+<div class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900">
+	<header class="p-8 flex justify-center items-center flex-wrap flex-col w-full mt-16">
+
+		<div class="format dark:format-invert format-lg mt-32 min-w-full">
+			<p class="text-4xl lg:text-8xl dark:text-slate-200 text-slate-600 leading-tight text-center">
+				Less <a
+					rel="noopener nofollow"
+					href="https://astro.build"
+					class="font-bold text-transparent bg-clip-text bg-gradient-to-br from-pink-400 to-violet-800 dark:from-pink-300 dark:to-violet-700 no-underline">Planning...</a
+				>
+				<br />More <a rel="noopener nofollow" href="https://flowbite.com" class="font-bold text-blue-600 dark:text-blue-500 no-underline">Working!</a>
+			</p>
+
+			<p class="text-lg mt-8 text-slate-600 dark:text-slate-400 text-center">
+				A simple and efficient sprint planning tool built with Astro, React and Tailwindcss to help you focus on getting things done.
+			</p>
+
+			<div class="flex justify-center w-full">
+				<ConfettiLauncher>
+				</ConfettiLauncher>
+			</div>
+		</div>
+	</header>
+
+	<section class="flex justify-center w-full pb-5">
+		<div class="w-full format dark:format-invert text-center">
+			<div class="animate-bounce mt-32">
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-blue-600 dark:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+				</svg>
+				<p class="text-lg mt-4 text-slate-600 dark:text-slate-400">Scroll down to discover more</p>
+			</div>
+		</div>
+	</section>
+
+	<article class="flex justify-center pt-32 pb-32">
+		<div class="w-full readme format dark:format-invert lg:format-lg">
+			<h1 class="text-center">
+				<!-- {readMe.getHeadings()[0].text} -->
+				Gitlab Planner
+			</h1>
+			<readMe.Content class="text-center" />
+		</div>
+	</article>
+</div>
+
+<style>
+	/* Override in Markdown H1 title */
+	.readme :global(h1:nth-of-type(2)) {
+		display: none;
+	}
+
+	.svg-inline :global(svg) {
+		height: 100%;
+		width: 100%;
+	}
+</style>

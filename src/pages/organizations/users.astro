@@ -1,0 +1,40 @@
+---
+import UserOverview from "@components/organizations/UserOverview";
+import LayoutSideBar from "@layouts/LayoutSideBar.astro";
+import type { OrgUsers } from "@myTypes/OrgUsers";
+import type { UserWithOrganizations } from "@myTypes/UserWithOrganizations";
+import { groupUsersByOrg } from "@utils/groupUsersByOrg";
+
+const response = await fetch(new URL("/api/users", Astro.url), {
+	headers: {
+		"Authorization": `Bearer ${await Astro.locals.auth().getToken()}`
+	}
+});
+const { users }: { users: UserWithOrganizations[] } = await response.json();
+const usersByOrg: Record<string, OrgUsers> = groupUsersByOrg(users);
+---
+
+<LayoutSideBar title="Users List">
+	<div class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900">
+		<div class="container mx-auto p-4">
+			<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Users by Organization</h1>
+			{
+				Object.entries(usersByOrg).map(([_, orgData]: [string, OrgUsers]) => (
+					<div class="mb-12">
+						<div class="flex items-center gap-4 mb-4">
+							<img
+								src={orgData.imageUrl}
+								alt={orgData.name}
+								class="w-12 h-12 rounded-lg object-cover"
+							/>
+							<h2 class="text-2xl font-bold text-gray-800 dark:text-white">{orgData.name}</h2>
+						</div>
+						<div class="relative overflow-x-auto shadow-md rounded-lg">
+							<UserOverview orgData={orgData} />
+						</div>
+					</div>
+				))
+			}
+		</div>
+	</div>
+</LayoutSideBar>

@@ -15,7 +15,8 @@
 			"@i18n/*": ["./src/i18n/*"],
 			"@myTypes/*": ["./src/types/*"],
 			"@utils/*": ["./src/utils/*"],
-			"@clerk/*": ["./src/clerk/*"]
+			"@clerk/*": ["./src/clerk/*"],
+			"@assets/*": ["./src/assets/*"]
 		},
 		"strictNullChecks": true,
 		"allowJs": true

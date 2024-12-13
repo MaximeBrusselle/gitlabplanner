@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 const themes = [
@@ -12,6 +14,8 @@ export default function ThemeSelector() {
 	const [currentTheme, setCurrentTheme] = useState<Theme>("system");
 
 	useEffect(() => {
+		if (typeof window === 'undefined') return;
+
 		// Initialize theme
 		const savedTheme = localStorage.getItem("theme") as Theme | null;
 		if (savedTheme) {
@@ -33,6 +37,8 @@ export default function ThemeSelector() {
 	}, []);
 
 	const setTheme = (theme: Theme) => {
+		if (typeof window === 'undefined') return;
+
 		if (theme === "system") {
 			const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 			document.documentElement.dataset.theme = systemTheme;

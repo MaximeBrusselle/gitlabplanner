@@ -1,8 +1,7 @@
 import type { APIRoute } from "astro";
 import { db } from "@db/index";
 import { usersTable, organizationMembersTable, organizationsTable } from "@db/schema";
-import { eq, inArray, and, notInArray } from "drizzle-orm";
-import type { UserWithOrganizations } from "@myTypes/UserWithOrganizations";
+import { eq, inArray } from "drizzle-orm";
 import type { CustomLocals } from "@myTypes/CustomLocals";
 import { syncDataToDatabase } from "@utils/clerk";
 

@@ -3,7 +3,6 @@ import SiteLayout from "@layouts/SiteLayout.astro";
 import type { User } from "@myTypes/User";
 import Card from "@components/Card.astro";
 import DeleteButton from "@components/sprints/DeleteButton";
-import { HoursGraph } from "@components/sprints/HoursGraph";
 
 const { sprintId } = Astro.params;
 const authToken = await Astro.locals.auth().getToken();
@@ -83,8 +82,6 @@ const statusColors: Record<string, string> = {
 					<div class="grid grid-cols-1 gap-4 sm:gap-6 place-items-center w-full">
 						<div class="w-full overflow-x-auto">
 							<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 min-w-[300px]">
-								<HoursGraph client:load />
-								<HoursGraph client:load />
 							</div>
 						</div>
 					</div>

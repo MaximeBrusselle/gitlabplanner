@@ -1,0 +1,111 @@
+---
+import { languages } from "@i18n/ui";
+import { getLangFromUrl, useTranslatedPath } from "@i18n/utils";
+import ThemeSelector from "@components/deprecated/ThemeSelector";
+import { SignedIn, UserButton, SignedOut, SignInButton } from "@clerk/astro/components";
+import { Settings, Menu } from "lucide-react";
+
+const lang = getLangFromUrl(Astro.url);
+const translatePath = useTranslatedPath(lang);
+
+const currentPath = Astro.url.pathname;
+const pathWithoutLang = currentPath.replace(/^\/(nl_BE)/, "") || "/";
+
+const navbarItems = [
+	{ label: "Home", href: "/" },
+	{ label: "Users", href: "/users" },
+	{ label: "Organizations", href: "/organizations" },
+	{ label: "Sprints", href: "/sprints" },
+];
+---
+
+<header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+		<!-- Mobile layout -->
+		<div class="flex items-center justify-between md:hidden">
+			<div class="dropdown">
+				<label tabindex="0" class="btn btn-ghost btn-circle">
+					<Menu className="h-5 w-5" />
+				</label>
+				<ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box min-w-[12rem]">
+					{
+						navbarItems.map((item) => (
+							<li>
+								<a href={item.href} class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+									{item.label}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+
+			<a href="/" class="text-xl font-bold text-gray-900 dark:text-white"> Gitlabplanner </a>
+
+			<div class="dropdown">
+				<label tabindex="0" class="btn btn-ghost btn-circle">
+					<Settings className="h-5 w-5" />
+				</label>
+				<ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box min-w-[12rem]">
+					<li>
+						<div class="w-full">
+							<ThemeSelector client:only="react" />
+						</div>
+					</li>
+					{
+						Object.entries(languages).map(([code, label]) => (
+							<li>
+								<a href={translatePath(pathWithoutLang, code)} class={code === lang ? "active" : ""}>
+									{label}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</div>
+
+		<!-- Desktop layout -->
+		<div class="hidden md:flex items-center justify-between">
+			<div class="flex items-center gap-6">
+				<a href="/" class="text-3xl font-bold text-gray-900 dark:text-white"> Gitlabplanner </a>
+				<nav class="flex gap-6">
+					{
+						navbarItems.map((item) => (
+							<a href={item.href} class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+								{item.label}
+							</a>
+						))
+					}
+				</nav>
+			</div>
+
+			<div class="flex items-center gap-6">
+				<div class="w-fit">
+					<ThemeSelector client:only="react" />
+				</div>
+				<ul class="menu menu-horizontal bg-base-200 rounded-box">
+					{
+						Object.entries(languages).map(([code, label]) => (
+							<li>
+								<a href={translatePath(pathWithoutLang, code)} class={code === lang ? "active" : ""}>
+									{label}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+				<SignedOut>
+					<SignInButton
+						mode="modal"
+						forceRedirectUrl={translatePath("/login")}
+						class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+					/>
+				</SignedOut>
+				<SignedIn>
+					<UserButton client:only="react" />
+				</SignedIn>
+			</div>
+		</div>
+	</div>
+</header>
