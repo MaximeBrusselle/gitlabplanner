@@ -36,7 +36,6 @@ let errors: FormErrors = {};
 // Handle form submission
 if (Astro.request.method === "POST") {
 	const formData = await Astro.request.formData();
-	console.log("🚀 ~ formData:", formData)
 	const data = {
 		name: formData.get("name"),
 		description: formData.get("description"),
@@ -63,7 +62,7 @@ if (Astro.request.method === "POST") {
 		}
 	} catch (error) {
 		if (error instanceof z.ZodError) {
-			console.error("Validation error:", error.errors);
+			console.error("Validation error");
 			errors = error.errors.reduce<FormErrors>((acc, curr) => {
 				acc[curr.path[0].toString()] = curr.message;
 				return acc;

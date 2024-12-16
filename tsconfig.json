@@ -16,7 +16,8 @@
 			"@myTypes/*": ["./src/types/*"],
 			"@utils/*": ["./src/utils/*"],
 			"@clerk/*": ["./src/clerk/*"],
-			"@assets/*": ["./src/assets/*"]
+			"@assets/*": ["./src/assets/*"],
+			"@stores/*": ["./src/stores/*"]
 		},
 		"strictNullChecks": true,
 		"allowJs": true

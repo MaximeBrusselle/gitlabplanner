@@ -15,6 +15,13 @@
       "when": 1733493125792,
       "tag": "0001_clean_doctor_octopus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1734362883207,
+      "tag": "0002_brown_stryfe",
+      "breakpoints": true
     }
   ]
 }

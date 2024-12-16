@@ -24,7 +24,6 @@ export default function UserSelector({ groupedUsers, currentUserId }: UserSelect
 		} else {
 			newSelected.delete(userId);
 		}
-		console.log("🚀 ~ handleUserSelection ~ newSelected:", newSelected);
 		setSelectedUsers(newSelected);
 	};
 

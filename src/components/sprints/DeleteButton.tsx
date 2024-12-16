@@ -24,7 +24,7 @@ export default function DeleteButton({ sprintId, authToken, onSuccess }: DeleteB
                 onSuccess?.() || (window.location.href = '/sprints');
             }
         } catch (error) {
-            console.error('Failed to delete sprint:', error);
+            console.error('Failed to delete sprint');
         } finally {
             setIsDeleting(false);
             setShowModal(false);
