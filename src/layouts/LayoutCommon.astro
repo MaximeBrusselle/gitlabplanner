@@ -1,5 +1,7 @@
 ---
 import pkg from "../../package.json" assert { type: "json" };
+
+const { title } = Astro.props;
 ---
 
 <!doctype html>
@@ -7,7 +9,7 @@ import pkg from "../../package.json" assert { type: "json" };
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>GitLab Planner</title>
+		<title>{title}</title>
 
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={pkg.description} />

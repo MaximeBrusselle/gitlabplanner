@@ -3,9 +3,11 @@ import FooterSidebar from '@components/nav/FooterSidebar.astro';
 import LayoutCommon from './LayoutCommon.astro';
 import NavBarSidebar from '@components/nav/NavBarSidebar.astro';
 import SideBar from '@components/nav/SideBar.astro';
+
+const { title } = Astro.props;
 ---
 
-<LayoutCommon>
+<LayoutCommon title={title}>
 	<NavBarSidebar />
 
 	<SideBar />

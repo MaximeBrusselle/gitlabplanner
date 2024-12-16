@@ -24,16 +24,16 @@ export const ROUTES: RouteCollection = {
 	sprints: {
 		title: "Sprints",
 		items: [
-			{ href: "/sprints/Overview", label: "Overview" },
-			{ href: "/sprints/Create", label: "Create" },
+			{ href: "/sprints/", label: "Overview" },
+			{ href: "/sprints/create", label: "Create" },
 		],
 		icon: "/icons/sprints.svg",
 	},
 	apps: {
 		title: "Apps",
 		items: [
-			{ href: "/apps/Overview", label: "Overview" },
-			{ href: "/apps/Create", label: "Create" },
+			{ href: "/apps/", label: "Overview" },
+			{ href: "/apps/create", label: "Create" },
 		],
 		icon: "/icons/apps.svg",
 	},
@@ -54,7 +54,7 @@ export const EXTERNAL_ROUTES: RouteCollection = {
 	},
 	docs: {
 		title: "Docs",
-		href: "https://flowbite.com/docs/getting-started/introduction/",
+		href: "/docs",
 		items: [],
 		icon: "/icons/docs.svg",
 	},

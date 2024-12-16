@@ -1,6 +1,5 @@
 ---
 import type { Sprint } from "@myTypes/Sprint";
-import Card from "@components/Card.astro";
 
 interface Props {
 	sprint: Sprint;
@@ -14,35 +13,37 @@ const endDate = new Date(sprint.endDate).toLocaleDateString("en-US", { month: "l
 
 // Status colors
 const statusColors = {
-	active: "badge-success",
-	completed: "badge-info",
-	cancelled: "badge-error",
-	planned: "badge-warning",
+	active: "text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300",
+	completed: "text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-300",
+	cancelled: "text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300",
+	planned: "text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300"
 };
 ---
 
-<Card hasHoverEffect={true}>
-	<div class="flex justify-between items-start">
-		<h2 class="card-title text-2xl font-bold text-gray-900 dark:text-white">{sprint.name}</h2>
-		<div class={`badge ${statusColors[sprint.status]} badge-lg capitalize`}>
+<div class="block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 group hover:scale-[1.01] transition-all duration-300">
+	<div class="flex flex-col sm:flex-row justify-between items-start gap-2">
+		<h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{sprint.name}</h2>
+		<span class={`px-3 py-1 text-xs font-medium rounded-full capitalize ${statusColors[sprint.status]}`}>
 			{sprint.status}
-		</div>
+		</span>
 	</div>
 
-	<div class="divider my-2"></div>
+	<hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700 group-hover:bg-gray-300 dark:group-hover:bg-gray-600">
 
-	<div class="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+	<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
 		<div>
-			<span class="font-semibold">Start Date:</span>
-			<p>{startDate}</p>
+			<span class="font-medium">Start Date:</span>
+			<p class="mt-1">{startDate}</p>
 		</div>
 		<div>
-			<span class="font-semibold">End Date:</span>
-			<p>{endDate}</p>
+			<span class="font-medium">End Date:</span>
+			<p class="mt-1">{endDate}</p>
 		</div>
 	</div>
 
-	<div class="card-actions justify-end mt-4">
-		<a href={`/sprints/${sprint.id}`} class="btn btn-primary"> View Details </a>
+	<div class="flex justify-end mt-4">
+		<a href={`/sprints/${sprint.id}`} class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+			View Details
+		</a>
 	</div>
-</Card>
+</div>

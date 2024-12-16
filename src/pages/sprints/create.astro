@@ -1,5 +1,5 @@
 ---
-import SiteLayout from "@layouts/SiteLayout.astro";
+import LayoutSidebar from "@layouts/LayoutSideBar.astro";
 import { groupUsersByOrg } from "@utils/groupUsersByOrg";
 import { z } from "zod";
 import UserSelector from "@components/sprints/UserSelector";
@@ -26,6 +26,12 @@ const response = await fetch(new URL("/api/users", Astro.url), {
 });
 const { users } = await response.json();
 const groupedUsers = groupUsersByOrg(users);
+
+// Initialize errors object with type
+type FormErrors = {
+	[key: string]: string;
+};
+let errors: FormErrors = {};
 
 // Handle form submission
 if (Astro.request.method === "POST") {
@@ -58,67 +64,78 @@ if (Astro.request.method === "POST") {
 	} catch (error) {
 		if (error instanceof z.ZodError) {
 			console.error("Validation error:", error.errors);
-			// You could handle validation errors here and display them to the user
+			errors = error.errors.reduce<FormErrors>((acc, curr) => {
+				acc[curr.path[0].toString()] = curr.message;
+				return acc;
+			}, {});
 		}
 	}
 }
 ---
 
-<SiteLayout title="Create Sprint">
-	<div class="container mx-auto px-4 py-4 sm:py-8">
-		<h1 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8">✨ Create New Sprint</h1>
+<LayoutSidebar title="Create New Sprint">
+	<div class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900">
+		<div class="p-4 border-2 border-gray-400 rounded-lg dark:border-gray-700 mt-14">
+			<h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">✨ Create New Sprint</h1>
 
-		<form method="POST" class="space-y-4 sm:space-y-8">
-			<div class="space-y-4 sm:space-y-6">
-				<h2 class="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4">📝 General Information</h2>
+			<form method="POST" class="space-y-6">
+				<div class="p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+					<h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">📝 General Information</h2>
 
-				<div class="form-control w-full">
-					<label class="label" for="name">
-						<span class="label-text text-sm sm:text-base">Sprint Name</span>
-						<span class="label-text-alt text-error text-xs sm:text-sm">*Required</span>
-					</label>
-					<input type="text" id="name" name="name" required class="input input-bordered w-full text-sm sm:text-base" placeholder="Enter sprint name" />
-				</div>
-
-				<div class="form-control w-full">
-					<label class="label" for="description">
-						<span class="label-text text-sm sm:text-base">Description</span>
-						<span class="label-text-alt text-xs sm:text-sm">(Optional)</span>
-					</label>
-					<textarea id="description" name="description" class="textarea textarea-bordered h-20 sm:h-24 text-sm sm:text-base" placeholder="Enter sprint description"></textarea>
-				</div>
-			</div>
-
-			<div class="space-y-4 sm:space-y-6">
-				<h2 class="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4">📅 Sprint Duration</h2>
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-					<div class="form-control w-full">
-						<label class="label" for="startDate">
-							<span class="label-text text-sm sm:text-base">Start Date</span>
-							<span class="label-text-alt text-error text-xs sm:text-sm">*Required</span>
+					<div class="mb-4">
+						<label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+							Sprint Name <span class="text-red-500">*</span>
 						</label>
-						<input type="date" id="startDate" name="startDate" required class="input input-bordered w-full text-sm sm:text-base" />
+						<input type="text" id="name" name="name" class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ${errors.name ? 'border-red-500' : 'border-gray-300'}`} placeholder="Enter sprint name" />
+						{errors.name && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.name}</p>}
 					</div>
 
-					<div class="form-control w-full">
-						<label class="label" for="endDate">
-							<span class="label-text text-sm sm:text-base">End Date</span>
-							<span class="label-text-alt text-error text-xs sm:text-sm">*Required</span>
+					<div>
+						<label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+							Description <span class="text-gray-500 text-sm">(Optional)</span>
 						</label>
-						<input type="date" id="endDate" name="endDate" required class="input input-bordered w-full text-sm sm:text-base" />
+						<textarea id="description" name="description" rows="4" class={`block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ${errors.description ? 'border-red-500' : 'border-gray-300'}`} placeholder="Enter sprint description"></textarea>
+						{errors.description && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.description}</p>}
 					</div>
 				</div>
-			</div>
 
-			<div class="space-y-4 sm:space-y-6">
-				<h2 class="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4">👥 Team Members</h2>
-				<UserSelector client:load groupedUsers={groupedUsers} currentUserId={currentUserId ?? ""} />
-			</div>
+				<div class="p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+					<h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">📅 Sprint Duration</h2>
+					
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<label for="startDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+								Start Date <span class="text-red-500">*</span>
+							</label>
+							<input type="date" id="startDate" name="startDate" class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.startDate ? 'border-red-500' : 'border-gray-300'}`} />
+							{errors.startDate && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.startDate}</p>}
+						</div>
 
-			<div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-4 sm:mt-8">
-				<a href="/sprints" class="btn btn-sm sm:btn-md btn-ghost bg-red-200 dark:bg-red-400 dark:text-white w-full sm:w-auto">❌ Cancel</a>
-				<button type="submit" class="btn btn-sm sm:btn-md btn-primary w-full sm:w-auto">🚀 Create Sprint</button>
-			</div>
-		</form>
+						<div>
+							<label for="endDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+								End Date <span class="text-red-500">*</span>
+							</label>
+							<input type="date" id="endDate" name="endDate" class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.endDate ? 'border-red-500' : 'border-gray-300'}`} />
+							{errors.endDate && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.endDate}</p>}
+						</div>
+					</div>
+				</div>
+
+				<div class="p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+					<h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">👥 Team Members</h2>
+					<UserSelector client:load groupedUsers={groupedUsers} currentUserId={currentUserId ?? ""} />
+					{errors.members && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.members}</p>}
+				</div>
+
+				<div class="flex flex-col sm:flex-row justify-end gap-2">
+					<a href="/sprints" class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+						❌ Cancel
+					</a>
+					<button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+						🚀 Create Sprint
+					</button>
+				</div>
+			</form>
+		</div>
 	</div>
-</SiteLayout>
+</LayoutSidebar>

@@ -1,5 +1,5 @@
 ---
-import SiteLayout from "@layouts/SiteLayout.astro";
+import LayoutSidebar from "@layouts/LayoutSideBar.astro";
 import SprintCard from "@components/sprints/SprintCard.astro";
 import type { Sprint } from "@myTypes/Sprint";
 
@@ -11,25 +11,31 @@ const response = await fetch(new URL("/api/sprints", Astro.url), {
 const { sprints } = await response.json();
 ---
 
-<SiteLayout title="Sprints">
-	<div class="container mx-auto px-4 py-8">
-		<div class="flex justify-between items-center mb-8">
-			<h1 class="text-3xl font-bold text-gray-900 dark:text-white">Sprints</h1>
-			<a href="/sprints/create" class="btn btn-primary">✨ Create Sprint</a>
-		</div>
+<LayoutSidebar title="Sprints Overview">
+	<div class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900">
+		<div class="p-4 border-2 border-gray-400 border-dashed rounded-lg dark:border-gray-700 mt-14">
+			<div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+				<h1 class="text-3xl font-bold text-gray-900 dark:text-white">Sprints</h1>
+				<a href="/sprints/create" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+					✨ Create Sprint
+				</a>
+			</div>
 
-		{sprints.length > 0 ? (
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				{sprints.map((sprint: Sprint) => (
-					<SprintCard sprint={sprint} />
-				))}
-			</div>
-		) : (
-			<div class="text-center py-12">
-				<h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">🔍 No Sprints Found</h3>
-				<p class="text-gray-600 dark:text-gray-400 mb-4">You don't have any sprints yet.</p>
-				<a href="/sprints/create" class="btn btn-primary">🚀 Create Your First Sprint</a>
-			</div>
-		)}
+			{sprints.length > 0 ? (
+				<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+					{sprints.map((sprint: Sprint) => (
+						<SprintCard sprint={sprint} />
+					))}
+				</div>
+			) : (
+				<div class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow">
+					<h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">🔍 No Sprints Found</h3>
+					<p class="text-gray-500 dark:text-gray-400 mb-4">You don't have any sprints yet.</p>
+					<a href="/sprints/create" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+						🚀 Create Your First Sprint
+					</a>
+				</div>
+			)}
+		</div>
 	</div>
-</SiteLayout>
+</LayoutSidebar>

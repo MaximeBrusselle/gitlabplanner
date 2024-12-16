@@ -1,7 +1,6 @@
 ---
-import SiteLayout from "@layouts/SiteLayout.astro";
+import LayoutSidebar from "@layouts/LayoutSideBar.astro";
 import type { User } from "@myTypes/User";
-import Card from "@components/Card.astro";
 import DeleteButton from "@components/sprints/DeleteButton";
 
 const { sprintId } = Astro.params;
@@ -21,77 +20,82 @@ const startDate = new Date(sprint.startDate).toLocaleDateString("en-US", { month
 const endDate = new Date(sprint.endDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
 const statusColors: Record<string, string> = {
-	active: "badge-success",
-	completed: "badge-info",
-	cancelled: "badge-error",
-	planned: "badge-warning",
+	active: "text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300",
+	completed: "text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-300",
+	cancelled: "text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300",
+	planned: "text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300"
 };
 ---
 
-<SiteLayout title={`Sprint: ${sprint.name}`}>
-	<div class="container mx-auto px-4 py-4 sm:py-8">
-		<Card hasHoverEffect={false}>
-			<div class="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-6 mb-4 sm:mb-6">
-				<div class="w-full sm:w-auto">
-					<div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-						<h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{sprint.name}</h1>
-						<div class="flex items-center gap-2">
-							<span class="text-lg sm:text-xl">📅</span>
-							<span class="text-sm sm:text-base text-gray-600 dark:text-gray-400">{startDate} - {endDate}</span>
+<LayoutSidebar title={`Sprint: ${sprint.name}`}>
+	<div class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900">
+		<div class="p-4 border-2 border-dashed border-gray-400 rounded-lg dark:border-gray-700 mt-14">
+			<div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+				<div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+					<div class="w-full md:w-auto">
+						<div class="flex flex-col md:flex-row items-start md:items-center gap-3">
+							<h1 class="text-2xl font-bold text-gray-900 dark:text-white">{sprint.name}</h1>
+							<div class="flex items-center gap-2">
+								<span class="text-xl">📅</span>
+								<span class="text-sm text-gray-600 dark:text-gray-400">{startDate} - {endDate}</span>
+							</div>
 						</div>
+						<p class="text-sm text-gray-600 dark:text-gray-400 mt-2">{sprint.description}</p>
 					</div>
-					<p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">{sprint.description}</p>
-				</div>
-				<div class="flex gap-2 items-center self-end sm:self-start">
-					<div class={`badge ${statusColors[sprint.status]} badge-lg capitalize`}>
-						{sprint.status}
+					<div class="flex gap-2 items-center self-start">
+						<span class={`px-3 py-1 text-xs font-medium rounded-full capitalize ${statusColors[sprint.status]}`}>
+							{sprint.status}
+						</span>
+						{sprint.role === "admin" && <DeleteButton client:load sprintId={Number(sprintId)} authToken={authToken} />}
 					</div>
-					{sprint.role === "admin" && <DeleteButton client:load sprintId={Number(sprintId)} authToken={authToken} />}
 				</div>
-			</div>
 
-			<div class="divider my-2 sm:my-4"></div>
+				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700">
 
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
-				<div class="space-y-4">
-					<div>
-						<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">👥 Team Members</h3>
-						<div class="mt-2 space-y-2">
-							{
-								sprint.members?.map((member: User) => (
-									<div class="flex items-center gap-2">
-										<div class="avatar placeholder">
-											<div class="bg-neutral-focus text-neutral-content rounded-full w-6 sm:w-8">
-												<img src={member.imageUrl} alt={member.name} />
-											</div>
-										</div>
-										<span class="text-sm sm:text-base">{member.name}</span>
+				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					<div class="space-y-4">
+						<div>
+							<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">👥 Team Members</h3>
+							<div class="space-y-3">
+								{sprint.members?.map((member: User) => (
+									<div class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+										<img 
+											src={member.imageUrl} 
+											alt={member.name}
+											class="w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-600"
+										/>
+										<span class="text-sm text-gray-900 dark:text-white">{member.name}</span>
 									</div>
-								))
-							}
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="divider my-2 sm:my-4"></div>
-
-			<div class="space-y-4 w-full">
-				<div class="w-full">
-					<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Analytics</h3>
-					<div class="grid grid-cols-1 gap-4 sm:gap-6 place-items-center w-full">
-						<div class="w-full overflow-x-auto">
-							<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 min-w-[300px]">
+								))}
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 
-			<div class="card-actions justify-end mt-4 sm:mt-6 space-x-2">
-				<a href="/sprints" class="btn btn-sm sm:btn-md">Back to Sprints</a>
-				<button class="btn btn-sm sm:btn-md btn-primary">Edit Sprint</button>
+				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700">
+
+				<div class="space-y-4 w-full">
+					<div class="w-full">
+						<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Analytics</h3>
+						<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+						</div>
+					</div>
+				</div>
+
+				<div class="flex flex-col sm:flex-row justify-end gap-2 mt-6">
+					<a 
+						href="/sprints" 
+						class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+					>
+						Back to Sprints
+					</a>
+					<button 
+						class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+					>
+						Edit Sprint
+					</button>
+				</div>
 			</div>
-		</Card>
+		</div>
 	</div>
-</SiteLayout>
+</LayoutSidebar>
