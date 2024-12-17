@@ -38,7 +38,7 @@ export const GET: APIRoute = async ({ locals, request }) => {
 				// Add search filter if search param exists
 				search ? sql`${sprintsTable.name} LIKE ${`%${search}%`}` : undefined,
 				// Add status filter if status param exists and is not 'All'
-				status && status !== "All" ? eq(sprintsTable.status, status.toLowerCase() as "active" | "completed" | "cancelled" | "planned") : undefined,
+				status && status !== "All" ? eq(sprintsTable.status, status.toLowerCase() as "active" | "completed" | "cancelled" | "planned" | "draft") : undefined,
 				// Add date range filters if they exist
 				startDate ? sql`${sprintsTable.startDate} <= ${endDate || "9999-12-31"} AND ${sprintsTable.endDate} >= ${startDate}` : undefined,
 				endDate ? sql`${sprintsTable.startDate} <= ${endDate} AND ${sprintsTable.endDate} >= ${startDate || "1970-01-01"}` : undefined
@@ -75,6 +75,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 	const sprint: Sprint = {
 		...body,
 		createdBy: currentUserId,
+		status: "draft",
 	};
 
 	const newSprint = await db.insert(sprintsTable).values(sprint).returning();

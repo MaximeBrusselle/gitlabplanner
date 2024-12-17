@@ -1,5 +1,6 @@
 ---
 import type { Sprint } from "@myTypes/Sprint";
+import { STATUS_COLORS } from "@utils/constants";
 
 interface Props {
 	sprint: Sprint;
@@ -10,20 +11,12 @@ const { sprint } = Astro.props;
 // Format dates to be more readable
 const startDate = new Date(sprint.startDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 const endDate = new Date(sprint.endDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-
-// Status colors
-const statusColors = {
-	active: "text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300",
-	completed: "text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-300",
-	cancelled: "text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300",
-	planned: "text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300"
-};
 ---
 
 <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 group hover:scale-[1.01] transition-all duration-300">
 	<div class="flex flex-col sm:flex-row justify-between items-start gap-2">
 		<h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{sprint.name}</h2>
-		<span class={`px-3 py-1 text-xs font-medium rounded-full capitalize ${statusColors[sprint.status]}`}>
+		<span class={`px-3 py-1 text-xs font-medium rounded-full capitalize ${STATUS_COLORS[sprint.status]}`}>
 			{sprint.status}
 		</span>
 	</div>

@@ -22,6 +22,13 @@
       "when": 1734362883207,
       "tag": "0002_brown_stryfe",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1734449175938,
+      "tag": "0003_aspiring_rattler",
+      "breakpoints": true
     }
   ]
 }

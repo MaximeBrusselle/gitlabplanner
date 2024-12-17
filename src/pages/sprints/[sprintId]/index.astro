@@ -4,6 +4,7 @@ import type { User } from "@myTypes/User";
 import DeleteButton from "@components/sprints/DeleteButton";
 import type { Application } from "@myTypes/Application";
 import SprintMember from "@components/sprints/SprintMember.astro";
+import { STATUS_COLORS } from "@utils/constants";
 
 const { sprintId } = Astro.params;
 const authToken = await Astro.locals.auth().getToken();
@@ -20,17 +21,12 @@ if (!sprint) {
 // Format dates to be more readable
 const startDate = new Date(sprint.startDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 const endDate = new Date(sprint.endDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-
-const statusColors: Record<string, string> = {
-	active: "text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300",
-	completed: "text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-300",
-	cancelled: "text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300",
-	planned: "text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300"
-};
 ---
 
 <LayoutSidebar title={`Sprint: ${sprint.name}`}>
-	<div class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900">
+	<div
+		class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900"
+	>
 		<div class="p-4 border-2 border-dashed border-gray-400 rounded-lg dark:border-gray-700 mt-14">
 			<div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
 				<div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
@@ -45,91 +41,118 @@ const statusColors: Record<string, string> = {
 						<p class="text-sm text-gray-600 dark:text-gray-400 mt-2">{sprint.description}</p>
 					</div>
 					<div class="flex gap-2 items-center self-start">
-						<span class={`px-3 py-1 text-xs font-medium rounded-full capitalize ${statusColors[sprint.status]}`}>
+						<span class={`px-3 py-1 text-xs font-medium rounded-full capitalize ${STATUS_COLORS[sprint.status]}`}>
 							{sprint.status}
 						</span>
-						{sprint.role === "admin" && (
-							<>
-								<a 
-									href={`/sprints/${sprintId}/edit`}
-									class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-									title="Edit Sprint"
-								>
-									<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-										<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-									</svg>
-								</a>
-								<DeleteButton client:load sprintId={Number(sprintId)} authToken={authToken} />
-							</>
-						)}
+						{
+							sprint.role === "admin" && (
+								<>
+									<a href={`/sprints/${sprintId}/edit`} class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" title="Edit Sprint">
+										<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+											<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+										</svg>
+									</a>
+									{sprint.status === "planned" && (
+										<a href={`/sprints/${sprintId}/plan/edit`} class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" title="Edit Sprint Plan">
+											<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+												<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+											</svg>
+										</a>
+									)}
+									<DeleteButton client:load sprintId={Number(sprintId)} authToken={authToken} />
+								</>
+							)
+						}
 					</div>
 				</div>
 
-				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700">
+				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700" />
 
 				<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 					<div class="space-y-4">
 						<div>
 							<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">👥 Team Members</h3>
 							<div class="flex flex-row flex-wrap gap-4">
-								{sprint.members?.map((member: User) => (
-									<SprintMember member={member} />
-								))}
+								{sprint.members?.map((member: User) => <SprintMember member={member} />)}
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700">
+				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700" />
 
 				<div class="space-y-4 w-full">
 					<div class="w-full">
 						<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📦 Applications</h3>
-						{sprint.applications.length === 0 ? (
-							<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
-								<p class="text-sm text-blue-800 dark:text-blue-200">
-									No applications have been submitted for this sprint.
-								</p>
-							</div>
-						) : (
-							<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-								{sprint.applications.map((application: Application) => (
-									<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
-										<p class="text-sm text-blue-800 dark:text-blue-200">
-											{application.name}
-										</p>
-									</div>
-								))}
-							</div>
-						)}
+						{
+							sprint.applications.length === 0 ? (
+								<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+									<p class="text-sm text-blue-800 dark:text-blue-200">No applications have been submitted for this sprint.</p>
+								</div>
+							) : (
+								<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+									{sprint.applications.map((application: Application) => (
+										<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+											<p class="text-sm text-blue-800 dark:text-blue-200">{application.name}</p>
+										</div>
+									))}
+								</div>
+							)
+						}
 					</div>
 				</div>
 
-				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700">
+				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700" />
 
 				<div class="space-y-4 w-full">
 					<div class="w-full">
 						<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Analytics</h3>
-						{sprint.status === 'planned' ? (
-							<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
-								<p class="text-sm text-blue-800 dark:text-blue-200">
-									Analytics will be available once the sprint is started. Please start the sprint to view analytics.
-								</p>
-							</div>
-						) : (
-							<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-							</div>
-						)}
+						{
+							sprint.status === "planned" || sprint.status === "draft" ? (
+								<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+									<p class="text-sm text-blue-800 dark:text-blue-200">Analytics will be available once the sprint is started. Please start the sprint to view analytics.</p>
+								</div>
+							) : (
+								<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+							)
+						}
 					</div>
 				</div>
 
 				<div class="flex flex-col sm:flex-row justify-end gap-2 mt-6">
-					<a 
-						href="/sprints" 
+					<a
+						href="/sprints"
 						class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
 					>
 						Back to Sprints
 					</a>
+					{
+						sprint.status === "draft" && (
+							<a href={`/sprints/${sprint.id}/plan`} class={`${STATUS_COLORS["planned"]} font-medium rounded-lg text-sm px-5 py-2.5 focus:ring-4 focus:outline-none`}>
+								Plan Sprint
+							</a>
+						)
+					}
+					{
+						sprint.status === "planned" && (
+							<a
+								href={`/sprints/${sprint.id}/start`}
+								class={`${STATUS_COLORS["active"]} font-medium rounded-lg text-sm px-5 py-2.5 focus:ring-4 focus:outline-none`}
+							>
+								Start Sprint
+							</a>
+						)
+					}
+					{
+						sprint.status === "active" && (
+							<a
+								href={`/sprints/${sprint.id}/complete`}
+								class={`${STATUS_COLORS["completed"]} font-medium rounded-lg text-sm px-5 py-2.5 focus:ring-4 focus:outline-none`}
+							>
+								Close Sprint
+							</a>
+						)
+					}
 				</div>
 			</div>
 		</div>

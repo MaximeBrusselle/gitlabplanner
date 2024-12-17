@@ -24,7 +24,7 @@ const response = await fetch(apiUrl, {
 });
 const { sprints } = await response.json();
 
-const statuses = ["All", "Active", "Completed", "Cancelled", "Planned"];
+const statuses = ["All", "Active", "Completed", "Cancelled", "Planned", "Draft"];
 ---
 
 <LayoutSidebar title="Sprints Overview">

@@ -65,3 +65,11 @@ export const EXTERNAL_ROUTES: RouteCollection = {
 		icon: "/icons/support.svg",
 	},
 };
+
+export const STATUS_COLORS: Record<string, string> = {
+	active: "text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300",
+	completed: "text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-300",
+	cancelled: "text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300",
+	planned: "text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300",
+	draft: "text-purple-800 bg-purple-100 dark:bg-purple-900 dark:text-purple-300"
+};
