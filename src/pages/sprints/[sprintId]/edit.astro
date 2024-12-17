@@ -9,6 +9,8 @@ if (!currentUserId) {
 	return Astro.redirect("/sprints");
 }
 
+const { sprintId } = Astro.params;
+
 // Define schema for sprint data
 const sprintSchema = z.object({
 	name: z.string().min(1, "Sprint name is required"),
@@ -17,6 +19,19 @@ const sprintSchema = z.object({
 	endDate: z.string().min(1, "End date is required"),
 	members: z.array(z.string()).min(1, "At least one member is required").default([currentUserId]),
 });
+
+// Fetch sprint data
+const sprintResponse = await fetch(new URL(`/api/sprints/${sprintId}`, Astro.url), {
+	headers: {
+		Authorization: `Bearer ${await Astro.locals.auth().getToken()}`,
+	},
+});
+
+if (!sprintResponse.ok) {
+	return Astro.redirect("/sprints");
+}
+
+const sprint = await sprintResponse.json().then((data) => data.sprint);
 
 // Fetch users for the form
 const response = await fetch(new URL("/api/users", Astro.url), {
@@ -43,13 +58,14 @@ if (Astro.request.method === "POST") {
 		endDate: formData.get("endDate"),
 		members: formData.getAll("members"),
 	};
+	console.log("🚀 ~ data:", data)
 
 	try {
 		// Validate the data
 		const validatedData = sprintSchema.parse(data);
 
-		const createResponse = await fetch(new URL("/api/sprints", Astro.url), {
-			method: "POST",
+		const updateResponse = await fetch(new URL(`/api/sprints/${sprintId}`, Astro.url), {
+			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${await Astro.locals.auth().getToken()}`,
@@ -57,8 +73,8 @@ if (Astro.request.method === "POST") {
 			body: JSON.stringify(validatedData),
 		});
 
-		if (createResponse.ok) {
-			return Astro.redirect("/sprints");
+		if (updateResponse.ok) {
+			return Astro.redirect(`/sprints/${sprintId}`);
 		}
 	} catch (error) {
 		if (error instanceof z.ZodError) {
@@ -72,10 +88,12 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<LayoutSidebar title="Create New Sprint">
-	<div class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900">
+<LayoutSidebar title="Edit Sprint">
+	<div
+		class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900"
+	>
 		<div class="p-4 border-2 border-gray-400 rounded-lg dark:border-gray-700 mt-14">
-			<h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">✨ Create New Sprint</h1>
+			<h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">✏️ Edit Sprint</h1>
 
 			<form method="POST" class="space-y-6">
 				<div class="p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -85,7 +103,14 @@ if (Astro.request.method === "POST") {
 						<label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
 							Sprint Name <span class="text-red-500">*</span>
 						</label>
-						<input type="text" id="name" name="name" class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ${errors.name ? 'border-red-500' : 'border-gray-300'}`} placeholder="Enter sprint name" />
+						<input
+							type="text"
+							id="name"
+							name="name"
+							value={sprint.name}
+							class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ${errors.name ? "border-red-500" : "border-gray-300"}`}
+							placeholder="Enter sprint name"
+						/>
 						{errors.name && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.name}</p>}
 					</div>
 
@@ -93,20 +118,32 @@ if (Astro.request.method === "POST") {
 						<label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
 							Description <span class="text-gray-500 text-sm">(Optional)</span>
 						</label>
-						<textarea id="description" name="description" rows="4" class={`block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ${errors.description ? 'border-red-500' : 'border-gray-300'}`} placeholder="Enter sprint description"></textarea>
+						<textarea
+							id="description"
+							name="description"
+							rows="4"
+							class={`block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ${errors.description ? "border-red-500" : "border-gray-300"}`}
+							placeholder="Enter sprint description">{sprint.description}</textarea
+						>
 						{errors.description && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.description}</p>}
 					</div>
 				</div>
 
 				<div class="p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
 					<h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">📅 Sprint Duration</h2>
-					
+
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div>
 							<label for="startDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
 								Start Date <span class="text-red-500">*</span>
 							</label>
-							<input type="date" id="startDate" name="startDate" class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.startDate ? 'border-red-500' : 'border-gray-300'}`} />
+							<input
+								type="date"
+								id="startDate"
+								name="startDate"
+								value={sprint.startDate}
+								class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.startDate ? "border-red-500" : "border-gray-300"}`}
+							/>
 							{errors.startDate && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.startDate}</p>}
 						</div>
 
@@ -114,7 +151,13 @@ if (Astro.request.method === "POST") {
 							<label for="endDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
 								End Date <span class="text-red-500">*</span>
 							</label>
-							<input type="date" id="endDate" name="endDate" class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.endDate ? 'border-red-500' : 'border-gray-300'}`} />
+							<input
+								type="date"
+								id="endDate"
+								name="endDate"
+								value={sprint.endDate}
+								class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.endDate ? "border-red-500" : "border-gray-300"}`}
+							/>
 							{errors.endDate && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.endDate}</p>}
 						</div>
 					</div>
@@ -122,16 +165,22 @@ if (Astro.request.method === "POST") {
 
 				<div class="p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
 					<h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">👥 Team Members</h2>
-					<UserSelector client:load groupedUsers={groupedUsers} currentUserId={currentUserId ?? ""} addedUsers={[currentUserId]} />
+					<UserSelector client:load groupedUsers={groupedUsers} currentUserId={currentUserId ?? ""} addedUsers={sprint.members.map((member: any) => member.id)} />
 					{errors.members && <p class="mt-2 text-sm text-red-600 dark:text-red-500">{errors.members}</p>}
 				</div>
 
 				<div class="flex flex-col sm:flex-row justify-end gap-2">
-					<a href="/sprints" class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+					<a
+						href="/sprints"
+						class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+					>
 						❌ Cancel
 					</a>
-					<button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-						🚀 Create Sprint
+					<button
+						type="submit"
+						class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+					>
+						💾 Save Changes
 					</button>
 				</div>
 			</form>

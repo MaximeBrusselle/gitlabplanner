@@ -2,6 +2,8 @@
 import LayoutSidebar from "@layouts/LayoutSideBar.astro";
 import type { User } from "@myTypes/User";
 import DeleteButton from "@components/sprints/DeleteButton";
+import type { Application } from "@myTypes/Application";
+import SprintMember from "@components/sprints/SprintMember.astro";
 
 const { sprintId } = Astro.params;
 const authToken = await Astro.locals.auth().getToken();
@@ -34,7 +36,7 @@ const statusColors: Record<string, string> = {
 				<div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
 					<div class="w-full md:w-auto">
 						<div class="flex flex-col md:flex-row items-start md:items-center gap-3">
-							<h1 class="text-2xl font-bold text-gray-900 dark:text-white">{sprint.name}</h1>
+							<h1 class="text-4xl font-bold text-gray-900 dark:text-white">{sprint.name}</h1>
 							<div class="flex items-center gap-2">
 								<span class="text-xl">📅</span>
 								<span class="text-sm text-gray-600 dark:text-gray-400">{startDate} - {endDate}</span>
@@ -46,7 +48,20 @@ const statusColors: Record<string, string> = {
 						<span class={`px-3 py-1 text-xs font-medium rounded-full capitalize ${statusColors[sprint.status]}`}>
 							{sprint.status}
 						</span>
-						{sprint.role === "admin" && <DeleteButton client:load sprintId={Number(sprintId)} authToken={authToken} />}
+						{sprint.role === "admin" && (
+							<>
+								<a 
+									href={`/sprints/${sprintId}/edit`}
+									class="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+									title="Edit Sprint"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+										<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+									</svg>
+								</a>
+								<DeleteButton client:load sprintId={Number(sprintId)} authToken={authToken} />
+							</>
+						)}
 					</div>
 				</div>
 
@@ -56,16 +71,9 @@ const statusColors: Record<string, string> = {
 					<div class="space-y-4">
 						<div>
 							<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">👥 Team Members</h3>
-							<div class="space-y-3">
+							<div class="flex flex-row flex-wrap gap-4">
 								{sprint.members?.map((member: User) => (
-									<div class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-										<img 
-											src={member.imageUrl} 
-											alt={member.name}
-											class="w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-600"
-										/>
-										<span class="text-sm text-gray-900 dark:text-white">{member.name}</span>
-									</div>
+									<SprintMember member={member} />
 								))}
 							</div>
 						</div>
@@ -76,9 +84,42 @@ const statusColors: Record<string, string> = {
 
 				<div class="space-y-4 w-full">
 					<div class="w-full">
+						<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📦 Applications</h3>
+						{sprint.applications.length === 0 ? (
+							<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+								<p class="text-sm text-blue-800 dark:text-blue-200">
+									No applications have been submitted for this sprint.
+								</p>
+							</div>
+						) : (
+							<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+								{sprint.applications.map((application: Application) => (
+									<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+										<p class="text-sm text-blue-800 dark:text-blue-200">
+											{application.name}
+										</p>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+				</div>
+
+				<hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700">
+
+				<div class="space-y-4 w-full">
+					<div class="w-full">
 						<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Analytics</h3>
-						<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-						</div>
+						{sprint.status === 'planned' ? (
+							<div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+								<p class="text-sm text-blue-800 dark:text-blue-200">
+									Analytics will be available once the sprint is started. Please start the sprint to view analytics.
+								</p>
+							</div>
+						) : (
+							<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+							</div>
+						)}
 					</div>
 				</div>
 
@@ -89,11 +130,6 @@ const statusColors: Record<string, string> = {
 					>
 						Back to Sprints
 					</a>
-					<button 
-						class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-					>
-						Edit Sprint
-					</button>
 				</div>
 			</div>
 		</div>

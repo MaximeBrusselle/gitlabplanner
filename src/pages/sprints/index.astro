@@ -3,12 +3,28 @@ import LayoutSidebar from "@layouts/LayoutSideBar.astro";
 import SprintCard from "@components/sprints/SprintCard.astro";
 import type { Sprint } from "@myTypes/Sprint";
 
-const response = await fetch(new URL("/api/sprints", Astro.url), {
+// Get search params from URL
+const searchParams = Astro.url.searchParams;
+const search = searchParams.get('search') || '';
+const status = searchParams.get('status') || 'All';
+const startDate = searchParams.get('startDate') || '';
+const endDate = searchParams.get('endDate') || '';
+
+// Build API URL with search params
+const apiUrl = new URL("/api/sprints", Astro.url);
+if (search) apiUrl.searchParams.set('search', search);
+if (status !== 'All') apiUrl.searchParams.set('status', status);
+if (startDate) apiUrl.searchParams.set('startDate', startDate);
+if (endDate) apiUrl.searchParams.set('endDate', endDate);
+
+const response = await fetch(apiUrl, {
 	headers: {
 		"Authorization": `Bearer ${await Astro.locals.auth().getToken()}`
 	}
 });
 const { sprints } = await response.json();
+
+const statuses = ["All", "Active", "Completed", "Cancelled", "Planned"];
 ---
 
 <LayoutSidebar title="Sprints Overview">
@@ -21,6 +37,59 @@ const { sprints } = await response.json();
 				</a>
 			</div>
 
+			<form class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+					<div>
+						<label for="search" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Search Sprint</label>
+						<input 
+							type="text" 
+							id="search" 
+							name="search"
+							value={search}
+							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+							placeholder="Search by name..."
+						>
+					</div>
+					<div>
+						<label for="status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+						<select 
+							id="status" 
+							name="status"
+							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+						>
+							{statuses.map(s => (
+								<option value={s} selected={s === status} class="capitalize">{s}</option>
+							))}
+						</select>
+					</div>
+					<div>
+						<label for="startDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date Range</label>
+						<div class="flex items-center gap-2">
+							<input 
+								type="date" 
+								id="startDate" 
+								name="startDate"
+								value={startDate}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+							>
+							<span class="text-gray-500 dark:text-gray-400">to</span>
+							<input 
+								type="date" 
+								id="endDate" 
+								name="endDate"
+								value={endDate}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+							>
+						</div>
+					</div>
+					<div class="flex items-end w-full justify-end">
+						<button type="submit" class="w-fit text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+							🔍 Search
+						</button>
+					</div>
+				</div>
+			</form>
+
 			{sprints.length > 0 ? (
 				<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 					{sprints.map((sprint: Sprint) => (
@@ -28,14 +97,26 @@ const { sprints } = await response.json();
 					))}
 				</div>
 			) : (
-				<div class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow">
+				<div class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow flex flex-col items-center justify-center">
 					<h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">🔍 No Sprints Found</h3>
-					<p class="text-gray-500 dark:text-gray-400 mb-4">You don't have any sprints yet.</p>
-					<a href="/sprints/create" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
-						🚀 Create Your First Sprint
-					</a>
+					<p class="text-gray-500 dark:text-gray-400 mb-4">No sprints found with the given filters.</p>
 				</div>
 			)}
 		</div>
 	</div>
 </LayoutSidebar>
+
+<script>
+	// Remove empty params and 'All' status before form submission
+	document.querySelector('form')?.addEventListener('submit', (e) => {
+		const form = e.target as HTMLFormElement;
+		const formData = new FormData(form);
+		
+		for (const [key, value] of formData.entries()) {
+			if (!value || (key === 'status' && value === 'All')) {
+				const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+				input.disabled = true;
+			}
+		}
+	});
+</script>

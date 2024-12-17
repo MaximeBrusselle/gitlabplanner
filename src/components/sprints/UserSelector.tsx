@@ -4,10 +4,11 @@ import type { OrgUsers } from "@myTypes/OrgUsers";
 interface UserSelectorProps {
 	groupedUsers: Record<string, OrgUsers>;
 	currentUserId: string;
+	addedUsers: string[];
 }
 
-export default function UserSelector({ groupedUsers, currentUserId }: UserSelectorProps) {
-	const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set([currentUserId]));
+export default function UserSelector({ groupedUsers, currentUserId, addedUsers }: UserSelectorProps) {
+	const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set(addedUsers));
 
 	useEffect(() => {
 		// Ensure current user is always selected
