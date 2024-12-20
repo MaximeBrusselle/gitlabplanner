@@ -29,6 +29,13 @@
       "when": 1734449175938,
       "tag": "0003_aspiring_rattler",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1734707415282,
+      "tag": "0004_melted_lyja",
+      "breakpoints": true
     }
   ]
 }

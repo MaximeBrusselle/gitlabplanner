@@ -1,0 +1,139 @@
+---
+import LayoutSidebar from "@layouts/LayoutSideBar.astro";
+import Card from "@components/Card.astro";
+import type { User } from "@myTypes/User";
+import { z } from "astro/zod";
+
+const { sprintId } = Astro.params;
+const authToken = await Astro.locals.auth().getToken();
+
+// Fetch sprint members for dropdown
+const response = await fetch(new URL(`/api/sprints/${sprintId}`, Astro.url), {
+	headers: {
+		Authorization: `Bearer ${authToken}`,
+	},
+});
+const { sprint } = await response.json();
+
+// Define validation schema
+const applicationSchema = z.object({
+	name: z.string().min(1, "Application name is required"),
+	description: z.string().optional(),
+	members: z.array(z.string().min(1, "At least one team member is required"))
+});
+
+let errors: Record<string, string[]> = {};
+
+if (Astro.request.method === "POST") {
+	const formData = await Astro.request.formData();
+	const name = formData.get("name");
+	const description = formData.get("description");
+	const members = formData.getAll("members");
+
+	// Validate form data
+	const result = applicationSchema.safeParse({
+		name,
+		description,
+		members
+	});
+
+	if (!result.success) {
+		errors = result.error.flatten().fieldErrors;
+	} else {
+		const createResponse = await fetch(new URL(`/api/sprints/${sprintId}/applications`, Astro.url), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${authToken}`,
+			},
+			body: JSON.stringify({
+				name,
+				description,
+				members,
+			}),
+		});
+
+		if (createResponse.ok) {
+			return Astro.redirect(`/sprints/${sprintId}`);
+		}
+	}
+}
+---
+
+<LayoutSidebar title="Add Application">
+  <div class="max-w-2xl mx-auto p-4">
+    <Card hasHoverEffect={false}>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Application</h1>
+
+      <form method="POST" class="space-y-6">
+        <div>
+          <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Application Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ${errors.name ? 'border-red-500 dark:border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.name && <p class="mt-1 text-sm text-red-500">{errors.name[0]}</p>}
+        </div>
+
+        <div>
+          <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            rows="4"
+            class={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white ${errors.description ? 'border-red-500 dark:border-red-500' : 'border-gray-300'}`}
+          ></textarea>
+          {errors.description && <p class="mt-1 text-sm text-red-500">{errors.description[0]}</p>}
+        </div>
+
+        <div>
+          <h3 class="mb-4 text-sm font-medium text-gray-900 dark:text-white">Team Members</h3>
+          <ul class={`w-full text-sm font-medium text-gray-900 bg-white border rounded-lg dark:bg-gray-700 dark:text-white ${errors.members ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}>
+            {sprint.members?.map((member: User) => (
+              <li class="w-full border-b border-gray-200 rounded-t-lg dark:border-gray-600 last:border-0">
+                <div class="flex items-center p-3 pl-4">
+                  <input
+                    id={`member-${member.id}`}
+                    type="checkbox"
+                    name="members" 
+                    value={member.id}
+                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <label
+                    for={`member-${member.id}`}
+                    class="flex items-center w-full py-2 ml-3 text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer"
+                  >
+                    <img
+                      src={member.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}`}
+                      alt={`${member.name}'s avatar`}
+                      class="w-8 h-8 rounded-full mr-3"
+                    />
+                    {member.name}
+                  </label>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {errors.members && <p class="mt-1 text-sm text-red-500">{errors.members[0]}</p>}
+        </div>
+
+        <div class="flex justify-end space-x-4">
+          <a
+            href={`/sprints/${sprintId}`}
+            class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+          >
+            Cancel
+          </a>
+          <button
+            type="submit"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          >
+            Add Application
+          </button>
+        </div>
+      </form>
+    </Card>
+  </div>
+</LayoutSidebar>

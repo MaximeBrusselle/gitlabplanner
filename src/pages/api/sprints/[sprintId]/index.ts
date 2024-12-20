@@ -1,8 +1,7 @@
 import type { APIRoute } from "astro";
 import { db } from "@db/index";
-import { sprintsTable, sprintMembersTable, usersTable, sprintApplicationsTable, applicationsTable, organizationMembersTable } from "@db/schema";
+import { sprintsTable, sprintMembersTable, usersTable, sprintApplicationsTable, applicationsTable, organizationMembersTable, applicationMembersTable } from "@db/schema";
 import { eq, and, inArray } from "drizzle-orm";
-import type { Sprint } from "@myTypes/Sprint";
 import { OrganizationRole } from "@myTypes/Organization";
 import type { CustomLocals } from "@myTypes/CustomLocals";
 
@@ -59,7 +58,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
 			);
 		}
 
-		const [members, applications] = await Promise.all([
+		const [members, sprintApplications] = await Promise.all([
 			db
 				.select({
 					id: usersTable.id,
@@ -76,6 +75,27 @@ export const GET: APIRoute = async ({ locals, params }) => {
 				.innerJoin(applicationsTable, eq(sprintApplicationsTable.applicationId, applicationsTable.id))
 				.where(eq(sprintApplicationsTable.sprintId, sprintId)),
 		]);
+
+		// Get application members for each application
+		const applications = await Promise.all(
+			sprintApplications.map(async (app) => {
+				const applicationMembers = await db
+					.select({
+						id: usersTable.id,
+						name: usersTable.name,
+						email: usersTable.email,
+						imageUrl: usersTable.imageUrl,
+					})
+					.from(applicationMembersTable)
+					.innerJoin(usersTable, eq(applicationMembersTable.userId, usersTable.id))
+					.where(eq(applicationMembersTable.applicationId, app.applications.id));
+
+				return {
+					...app.applications,
+					members: applicationMembers
+				};
+			})
+		);
 
 		return new Response(
 			JSON.stringify({

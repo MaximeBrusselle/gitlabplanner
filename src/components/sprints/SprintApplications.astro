@@ -1,0 +1,30 @@
+---
+import type { ApplicationDetails } from "@myTypes/Application";
+import SprintApplication from "@components/sprints/SprintApplication";
+
+const { sprint, sprintId } = Astro.props;
+---
+
+<div class="space-y-4 w-full">
+    <div class="w-full">
+        <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📦 Applications</h3>
+            <a href={`/sprints/${sprintId}/add-application`} class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                + Add
+            </a>
+        </div>
+        {
+            sprint.applications.length === 0 ? (
+                <div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                    <p class="text-sm text-blue-800 dark:text-blue-200">No applications have been submitted for this sprint.</p>
+                </div>
+            ) : (
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {sprint.applications.map((application: ApplicationDetails) => (
+                        <SprintApplication client:load application={application} />
+                    ))}
+                </div>
+            )
+        }
+    </div>
+</div>

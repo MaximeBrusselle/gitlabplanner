@@ -55,7 +55,7 @@ export const applicationsTable = sqliteTable("applications", {
 });
 
 export const applicationMembersTable = sqliteTable("application_members", {
-  applicationId: text("application_id").notNull().references(() => applicationsTable.id),
+  applicationId: int("application_id").notNull().references(() => applicationsTable.id),
   userId: text("user_id").notNull().references(() => usersTable.id),
   availableHours: real("available_hours").notNull().default(0),
   spentHours: real("spent_hours").notNull().default(0),
@@ -64,7 +64,7 @@ export const applicationMembersTable = sqliteTable("application_members", {
 
 export const sprintApplicationsTable = sqliteTable("sprint_applications", {
   sprintId: int("sprint_id").notNull().references(() => sprintsTable.id),
-  applicationId: text("application_id").notNull().references(() => applicationsTable.id),
+  applicationId: int("application_id").notNull().references(() => applicationsTable.id),
   availableHours: int("available_hours").notNull().default(0),
   spentHours: int("spent_hours").notNull().default(0),
   plannedHours: int("planned_hours").notNull().default(0),

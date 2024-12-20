@@ -104,6 +104,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			sprint: sprint,
 			message: "Sprint created successfully",
 		}),
-		{ status: 200 }
+		{ status: 201 }
 	);
 };
