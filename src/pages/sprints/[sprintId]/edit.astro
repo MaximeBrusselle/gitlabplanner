@@ -58,7 +58,6 @@ if (Astro.request.method === "POST") {
 		endDate: formData.get("endDate"),
 		members: formData.getAll("members"),
 	};
-	console.log("🚀 ~ data:", data)
 
 	try {
 		// Validate the data
@@ -92,7 +91,7 @@ if (Astro.request.method === "POST") {
 	<div
 		class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900"
 	>
-		<div class="p-4 border-2 border-gray-400 rounded-lg dark:border-gray-700 mt-14">
+		<div class="p-4 border-2 border-dashed border-gray-400 rounded-lg dark:border-gray-700 mt-14">
 			<h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">✏️ Edit Sprint</h1>
 
 			<form method="POST" class="space-y-6">
@@ -171,7 +170,7 @@ if (Astro.request.method === "POST") {
 
 				<div class="flex flex-col sm:flex-row justify-end gap-2">
 					<a
-						href="/sprints"
+						href={`/sprints/${sprintId}`}
 						class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
 					>
 						❌ Cancel

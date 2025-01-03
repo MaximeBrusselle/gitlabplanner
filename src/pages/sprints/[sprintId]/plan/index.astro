@@ -1,8 +1,28 @@
 ---
 import LayoutSideBar from "@layouts/LayoutSideBar.astro";
-import NotImplementedYet from "@components/pages/NotImplementedYet.astro";
+import PlanningForm from "@components/sprints/plan/PlanningForm";
+
+const { sprintId } = Astro.params;
+const authToken = await Astro.locals.auth().getToken();
+const response = await fetch(new URL(`/api/sprints/${sprintId}`, Astro.url), {
+	headers: {
+		Authorization: `Bearer ${authToken}`,
+	},
+});
+const { sprint } = await response.json();
+if (!sprint) {
+	return Astro.redirect("/sprints");
+}
+
+const apps = await sprint.applications;
+const members = await sprint.members;
 ---
 
-<LayoutSideBar title="Sprint Plan">
-	<NotImplementedYet pageTitle="Sprint Plan" />
+<LayoutSideBar title="Plan Sprint">
+	<div class="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-slate-100 mb-20 p-4 lg:p-16 shadow-xl shadow-slate-200 dark:shadow-slate-900">
+		<div class="p-4 border-2 border-dashed border-gray-400 rounded-lg dark:border-gray-700 mt-14">
+			<h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">🔍 Plan Sprint</h1>
+			<PlanningForm client:load sprint={sprint} members={members} apps={apps} />
+		</div>
+	</div>
 </LayoutSideBar>

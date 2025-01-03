@@ -6,7 +6,7 @@ export type Sprint = {
     description: string;
     startDate: string;
     endDate: string;
-    status: "active" | "completed" | "cancelled" | "planned";
+    status: "active" | "completed" | "cancelled" | "planned" | "readyToPlan" | "draft";
     createdBy: string;
 }
 

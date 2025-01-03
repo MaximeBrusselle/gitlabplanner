@@ -32,7 +32,7 @@ export const sprintsTable = sqliteTable("sprints", {
   description: text("description"),
   startDate: text("start_date").notNull(),
   endDate: text("end_date").notNull(),
-  status: text("status", { enum: ["active", "completed", "cancelled", "planned", "draft"] }).notNull().default("draft"),
+  status: text("status", { enum: ["active", "completed", "cancelled", "planned", "draft", "readyToPlan"] }).notNull().default("draft"),
   createdBy: text("created_by").notNull().references(() => usersTable.id),
   availableHours: int("available_hours").notNull().default(0),
   spentHours: int("spent_hours").notNull().default(0),

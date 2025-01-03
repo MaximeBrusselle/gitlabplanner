@@ -173,9 +173,6 @@ At present, we officially aim to support the last two versions of the following 
 </div>
 
 ## 📦 Resources
-
-- Live preview: <https://themesberg.github.io/flowbite-astro-admin-dashboard/>
-
 - Astro documentation: <https://docs.astro.build/>
 - Clerk documentation: <https://clerk.com/docs/>
 - Cloudflare documentation: <https://developers.cloudflare.com/d1/>
