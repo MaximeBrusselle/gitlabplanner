@@ -51,15 +51,13 @@ export const sprintMembersTable = sqliteTable("sprint_members", {
 export const applicationsTable = sqliteTable("applications", {
   id: int("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
-  description: text("description"),
 });
 
 export const applicationMembersTable = sqliteTable("application_members", {
   applicationId: int("application_id").notNull().references(() => applicationsTable.id),
   userId: text("user_id").notNull().references(() => usersTable.id),
-  availableHours: real("available_hours").notNull().default(0),
-  spentHours: real("spent_hours").notNull().default(0),
-  plannedHours: real("planned_hours").notNull().default(0),
+  availableHours: int("available_hours").notNull().default(0),
+  percentage: int("percentage").notNull().default(0),
 });
 
 export const sprintApplicationsTable = sqliteTable("sprint_applications", {
