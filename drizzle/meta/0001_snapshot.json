@@ -1,15 +1,15 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "47073980-ae50-47e3-905c-101ae56d46e2",
-  "prevId": "dfe2c29e-b128-4301-90ba-b535c04b5c5d",
+  "id": "17cb530b-6e55-447b-b5b9-4da7b0075710",
+  "prevId": "f8299c4d-73a7-45dc-8e63-8db988cc9069",
   "tables": {
     "application_members": {
       "name": "application_members",
       "columns": {
         "application_id": {
           "name": "application_id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -21,9 +21,17 @@
           "notNull": true,
           "autoincrement": false
         },
-        "work_days": {
-          "name": "work_days",
-          "type": "real",
+        "available_hours": {
+          "name": "available_hours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "percentage": {
+          "name": "percentage",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -73,44 +81,16 @@
           "notNull": true,
           "autoincrement": true
         },
-        "organization_id": {
-          "name": "organization_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "applications_organization_id_organizations_id_fk": {
-          "name": "applications_organization_id_organizations_id_fk",
-          "tableFrom": "applications",
-          "tableTo": "organizations",
-          "columnsFrom": [
-            "organization_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -138,7 +118,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-06T13:52:05.774Z'"
+          "default": "'2025-01-10T13:58:06.162Z'"
         },
         "role": {
           "name": "role",
@@ -225,7 +205,7 @@
         },
         "application_id": {
           "name": "application_id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -415,7 +395,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'planned'"
+          "default": "'draft'"
         },
         "created_by": {
           "name": "created_by",
@@ -442,6 +422,14 @@
         },
         "planned_hours": {
           "name": "planned_hours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "buffer": {
+          "name": "buffer",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -506,7 +494,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-06T13:52:05.774Z'"
+          "default": "'2025-01-10T13:58:06.160Z'"
         },
         "last_sign_in": {
           "name": "last_sign_in",
@@ -514,7 +502,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-12-06T13:52:05.774Z'"
+          "default": "'2025-01-10T13:58:06.160Z'"
         }
       },
       "indexes": {

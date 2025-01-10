@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { User } from "@myTypes/User";
 import type { Sprint } from "@myTypes/Sprint";
 import { convertTimeStringToHours } from "@utils/datetimeUtils";
+import { navigate } from "astro:transitions/client";
 
 // Validation schema
 const planningSchema = z.object({
@@ -32,15 +33,16 @@ const planningSchema = z.object({
 	buffer: z.number().min(0, "Buffer must be greater than 0").max(100, "Buffer must be less than 100").default(0),
 });
 
-type PlanningFormData = z.infer<typeof planningSchema>;
+export type PlanningFormData = z.infer<typeof planningSchema>;
 
 interface Props {
 	sprint: Sprint;
 	members: User[];
 	apps: Array<{ id: string; name: string; members: User[] }>;
+	authToken: string;
 }
 
-export default function PlanningForm({ sprint, members, apps }: Props) {
+export default function PlanningForm({ sprint, members, apps, authToken }: Props) {
 	const {
 		register,
 		handleSubmit,
@@ -52,7 +54,25 @@ export default function PlanningForm({ sprint, members, apps }: Props) {
 	});
 
 	const onSubmit = async (data: PlanningFormData) => {
-		console.log(data);
+		try {
+			const response = await fetch(`/api/sprints/${sprint.id}/plan`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${authToken}`,
+				},
+				body: JSON.stringify(data),
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to save sprint plan');
+			}
+
+			// Refresh page after successful save
+			navigate(`/sprints/${sprint.id}`);
+		} catch (error) {
+			console.error('Error saving sprint plan:', error);
+		}
 	};
 
 	const [buffer, setBuffer] = useState(0);

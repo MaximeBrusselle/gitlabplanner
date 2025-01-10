@@ -6,8 +6,12 @@ export type Application = {
   description: string;
 };
 
+export type ApplicationMember = User & {
+  percentage: number;
+};
+
 export type ApplicationDetails = Application & {
-  members: User[];
+  members: ApplicationMember[];
   availableHours: number;
   plannedHours: number;
   spentHours: number;

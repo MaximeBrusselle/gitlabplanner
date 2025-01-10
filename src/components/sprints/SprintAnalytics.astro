@@ -1,0 +1,108 @@
+---
+import SprintDetailsAppsPlanned from "@components/graphs/sprint/SprintDetailsAppsPlanned";
+import SprintDetailsHours from "@components/graphs/sprint/SprintDetailsHours";
+import type { SprintDetails } from "@myTypes/Sprint";
+
+interface SprintAnalyticsProps {
+	sprint: SprintDetails;
+    sprintId: number;
+}
+
+const { sprint, sprintId } = Astro.props as SprintAnalyticsProps;
+---
+<div class="space-y-4 w-full">
+    <div class="w-full">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Analytics</h3>
+        {
+            sprint.status === "draft" ? (
+                <div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                    <p class="text-sm text-blue-800 dark:text-blue-200">Analytics will be available once the sprint is started. Please start the sprint to view analytics.</p>
+                </div>
+            ) : (
+                <div class="w-full flex flex-col justify-center items-center gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full">
+                        {/* Total Hours Stats */}
+                        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                            <h4 class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Hours Overview</h4>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Available Hours</span>
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {sprint.applications.reduce((sum, app) => sum + (app.availableHours || 0), 0)}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Planned Hours</span>
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {sprint.applications.reduce((sum, app) => sum + (app.plannedHours || 0), 0)}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Spent Hours</span>
+                                    <span class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                                        {sprint.applications.reduce((sum, app) => sum + (app.spentHours || 0), 0)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Team Stats */}
+                        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                            <h4 class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Team Overview</h4>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Team Members</span>
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {sprint.members.length}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Applications</span>
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {sprint.applications.length}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Avg Hours per Member</span>
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {Math.round(sprint.applications.reduce((sum, app) => sum + (app.plannedHours || 0), 0) / (sprint.members.length || 1))}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Progress Stats */}
+                        <div class="p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                            <h4 class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Progress Overview</h4>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Completion Rate</span>
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {Math.round((sprint.applications.reduce((sum, app) => sum + (app.spentHours || 0), 0) /
+                                        (sprint.applications.reduce((sum, app) => sum + (app.plannedHours || 0), 0) || 1)) * 100)}%
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Remaining Hours</span>
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {sprint.applications.reduce((sum, app) => sum + (app.plannedHours || 0), 0) -
+                                        sprint.applications.reduce((sum, app) => sum + (app.spentHours || 0), 0)}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Utilization Rate</span>
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        {Math.round((sprint.applications.reduce((sum, app) => sum + (app.spentHours || 0), 0) /
+                                        (sprint.applications.reduce((sum, app) => sum + (app.availableHours || 0), 0) || 1)) * 100)}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full">
+                        <SprintDetailsHours client:load sprint={sprint} />
+                        <SprintDetailsAppsPlanned client:load sprint={sprint} />
+                    </div>
+                </div>
+            )
+        }
+    </div>
+</div>

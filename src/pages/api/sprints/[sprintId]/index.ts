@@ -85,6 +85,7 @@ export const GET: APIRoute = async ({ locals, params }) => {
 						name: usersTable.name,
 						email: usersTable.email,
 						imageUrl: usersTable.imageUrl,
+						percentage: applicationMembersTable.percentage,
 					})
 					.from(applicationMembersTable)
 					.innerJoin(usersTable, eq(applicationMembersTable.userId, usersTable.id))
@@ -92,14 +93,24 @@ export const GET: APIRoute = async ({ locals, params }) => {
 
 				return {
 					...app.applications,
+					availableHours: app.sprint_applications.availableHours,
+					plannedHours: app.sprint_applications.plannedHours,
+					spentHours: app.sprint_applications.spentHours,
 					members: applicationMembers
 				};
 			})
 		);
 
+		const dataToReturn = {
+			...sprint[0],
+			members,
+			role: sprintMember[0].role,
+			applications,
+		};
+
 		return new Response(
 			JSON.stringify({
-				sprint: { ...sprint[0], members, role: sprintMember[0].role, applications },
+				sprint: dataToReturn,
 				message: "Sprint fetched successfully",
 			}),
 			{ status: 200 }

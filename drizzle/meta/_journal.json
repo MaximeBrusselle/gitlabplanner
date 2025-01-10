@@ -5,36 +5,15 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1733486143997,
-      "tag": "0000_striped_agent_zero",
+      "when": 1736516134114,
+      "tag": "0000_elite_moira_mactaggert",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "6",
-      "when": 1733493125792,
-      "tag": "0001_clean_doctor_octopus",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1734362883207,
-      "tag": "0002_brown_stryfe",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1734449175938,
-      "tag": "0003_aspiring_rattler",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1734707415282,
-      "tag": "0004_melted_lyja",
+      "when": 1736517486182,
+      "tag": "0001_grey_iron_patriot",
       "breakpoints": true
     }
   ]
